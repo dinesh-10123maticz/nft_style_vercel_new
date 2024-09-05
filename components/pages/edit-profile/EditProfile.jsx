@@ -28,18 +28,21 @@ export default function EditProfile({params}) {
   const [err,setErr]=useState({})
   const [Follow, SetFollow] = useState("follow");
 
-  const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text).then(
-      () => {
-        // toast.success('Copied!');
-        console.log('Copied!');
+  const copyToClipboard = async (text) => {
+    try{
+      await  navigator?.clipboard?.writeText(text).then(
+        () => {
+          console.log('Copied!');
+  
+        },
+        () => {
+          console.error('Failed to copy!');
+        }
+      );
+    }catch(e){
+console.error(e)
+    }
 
-      },
-      () => {
-        console.error('Failed to copy!');
-        // toast.error('Failed to copy!');
-      }
-    );
   };
 
 
@@ -79,7 +82,7 @@ export default function EditProfile({params}) {
         Register_Section: {
           User: {
             payload: profileInfo?.data,
-            token: profileInfo.token ? profileInfo.token : token,
+            token: profileInfo?.token ? profileInfo?.token : token,
           },
         },
       });
@@ -103,7 +106,7 @@ export default function EditProfile({params}) {
         var Resp;
         Resp = await userRegister({
           Type: "profileimage",
-          WalletAddress: userData.WalletAddress,
+          WalletAddress: userData?.WalletAddress,
           Profile: files[0],
         });
         if (Resp?.success == "success") {
