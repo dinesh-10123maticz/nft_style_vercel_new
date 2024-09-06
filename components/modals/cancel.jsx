@@ -164,6 +164,8 @@ export default function Cancel({
                                 <button
                                     type="button"
                                     onClick={closePop}
+                                    data-bs-dismiss="modal"
+                                aria-label="Close"
                                     disabled    =   {Btn === "process"  ||  Btn ==="done" ? true : false} 
                                     className="rounded-full bg-accent py-3 px-8 text-center font-semibold text-white shadow-accent-volume transition-all hover:bg-accent-dark"
                                 >

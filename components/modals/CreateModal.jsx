@@ -23,64 +23,31 @@ export default function CreateModal({
               <h5 className="modal-title" id="placeBidLabel">
                 Follow Steps
               </h5>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-                ref={modelref}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  width="24"
-                  height="24"
-                  className="h-6 w-6 fill-jacarta-700 dark:fill-white"
+              
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                  ref={modelref}
                 >
-                  <path fill="none" d="M0 0h24v24H0z" />
-                  <path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z" />
-                </svg>
-              </button>
+                 {!(UploadButton == "done") && ( <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                    className="h-6 w-6 fill-jacarta-700 dark:fill-white"
+                  >
+                    <path fill="none" d="M0 0h24v24H0z" />
+                    <path d="M12 10.586l4.95-4.95 1.414 1.414-4.95 4.95 4.95 4.95-1.414 1.414-4.95-4.95-4.95 4.95-1.414-1.414 4.95-4.95-4.95-4.95L7.05 5.636z" />
+                  </svg>
+              )}
+
+                </button>
             </div>
 
             {/* Body */}
             <div className="modal-body p-6">
-              {/* {ApproveButton == "start" && (
-                <div>
-                  <div className="mb-[20px]">
-                    <div className="font-display text-sm font-semibold text-jacarta-700 dark:text-white">
-                      Approve Call
-                    </div>
-                    <div className="text-sm dark:text-jacarta-400">
-                      One Time Process
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-center space-x-4">
-                    <button
-                      type="button"
-                      className="rounded-full bg-accent py-3 px-8 text-center font-semibold text-white shadow-accent-volume transition-all hover:bg-accent-dark"
-                      disabled={
-                        ApproveButton == "process" || ApproveButton == "done"
-                          ? true
-                          : false
-                      }
-                      onClick={
-                        ApproveButton == "start" || ApproveButton == "try"
-                          ? TokenApproveCall
-                          : null
-                      }
-                      disableRipple
-                    >
-                      {ApproveButton == "start" && "Start"}
-                      {ApproveButton == "process" && "In-Progress"}
-                      {ApproveButton == "try" && "Try-Again"}
-                      {ApproveButton == "done" && "Done"}
-                    </button>
-                  </div>
-                </div>
-              )} */}
-
               <div>
                 <div className="mb-[20px]">
                   <div className="font-display text-sm font-semibold text-jacarta-700 dark:text-white">

@@ -5,7 +5,7 @@ import FileUpload from "./FileUpload";
 import Image from "next/image";
 import moment from "moment";
 import Select from "react-select";
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation";
 
 //files
 import CreateModal from "../modals/CreateModal";
@@ -13,16 +13,19 @@ import CreateModal from "../modals/CreateModal";
 //Finctions
 import Config from "@/Config/config";
 import { ImgValidation, isEmpty } from "@/actions/common";
-import { CreateNFT, NFTImageUpload, nftNameValidation } from "@/actions/axios/nft.axios";
+import {
+  CreateNFT,
+  NFTImageUpload,
+  nftNameValidation,
+} from "@/actions/axios/nft.axios";
 
 //npm
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import UseSolana from "@/actions/useSolana";
 
-
-import idl from '@/Abi/abi.json'
-import useContact from "@/utlis/hooks/solanaContractHook"
+import idl from "@/Abi/abi.json";
+import useContact from "@/utlis/hooks/solanaContractHook";
 
 const collcections = [
   {
@@ -72,21 +75,16 @@ const enddate = [
   { value: "Scheduled Listing", label: "Scheduled Listing" },
 ];
 export default function Create() {
-
-
-  const {push} = useRouter()
+  const { push } = useRouter();
 
   const userPayload = useSelector((state) => state.LoginReducer.User.payload);
   const { accountAddress } = useSelector(
     (state) => state.LoginReducer.AccountDetails
   );
 
-  
   const { currency, Categorys } = useSelector((state) => state.LoginReducer);
 
-
-  const solanaContractHook = useContact()
-
+  const solanaContractHook = useContact();
 
   // const solanaAction = UseSolana()
   const initialTokenValue = {
@@ -153,33 +151,31 @@ export default function Create() {
     setIsChecked(event.target.checked);
   };
 
-  useEffect(()=>{
-    console.log("currentCurrency",currency[0])
+  useEffect(() => {
+    console.log("currentCurrency", currency[0]);
     setNFTFormValue({
       ...NFTFormValue,
-      ["CoinName"] : currency?.[0]?.value
-    })
-  },[currency])
+      ["CoinName"]: currency?.[0]?.value,
+    });
+  }, [currency]);
 
-  useEffect(()=>{
- setNFTFormValue({
-  ...NFTFormValue,
-   NFTCreator: userPayload?.WalletAddress,
-  NFTOwner: userPayload?.WalletAddress})
-  },[userPayload])
+  useEffect(() => {
+    setNFTFormValue({
+      ...NFTFormValue,
+      NFTCreator: userPayload?.WalletAddress,
+      NFTOwner: userPayload?.WalletAddress,
+    });
+  }, [userPayload]);
 
-
-/* TEsting purpose */
-// useEffect(()=>{
-//   createref.current.click();
-// },[])
-
-
+  /* TEsting purpose */
+  // useEffect(()=>{
+  //   createref.current.click();
+  // },[])
 
   // MODEL CLOSE
-  const modelClose = () =>{
+  const modelClose = () => {
     modelref.current.click();
-  }
+  };
   const DateSelection = (e, data) => {
     if (data == "start") {
       if (e.value == "List Immediately")
@@ -245,8 +241,21 @@ export default function Create() {
     }
   };
 
+  function loadImageFromFile(file) {
+    return new Promise((resolve, reject) => {
+      const img = new window.Image();
+      const fileURL = URL.createObjectURL(file);
+      img.src = fileURL;
+      img.onload = function () {
+        const width = img.width;
+        const height = img.height;
+        resolve({ width, height });
+      };
+    });
+  }
+
   // Input and Image onChange Function
-  const onChange = (e, acceptedfile, type) => {
+  const onChange = async (e, acceptedfile, type) => {
     console.log("acceptedfile-->", acceptedfile, type, e);
     if (accountAddress) {
       SetFormButton("start");
@@ -254,8 +263,9 @@ export default function Create() {
       if (e && e.target) {
         const { value, id } = e.target;
         if (id == "NFTRoyalty" || id == "NFTPrice" || id == "NFTMinimumBid") {
-          const checkprice = /^\d*\.?\d*$/;
-          if (checkprice.test(value))
+          const checkprice = Config.NumOnly;
+          console.log("checkprice.test(value)", checkprice.test(value), value);
+          if (checkprice.test(value) || value == "")
             setNFTFormValue({ ...NFTFormValue, ...{ [id]: value } });
         } else {
           setNFTFormValue({ ...NFTFormValue, ...{ [id]: value } });
@@ -294,10 +304,20 @@ export default function Create() {
         }
         if (type == "Orginal") {
           console.log("original", acceptedfile[0]);
-          setNFTFormValue({
-            ...NFTFormValue,
-            ...{ ["NFTOrginalImage"]: acceptedfile[0] },
-          });
+          const { width, height } = await loadImageFromFile(acceptedfile[0]);
+          console.log("🚀 ~ onChange ~ width, height:", width, height);
+          if (
+            acceptedfile[0].type.includes("image") &&
+            (height < 230 || height < "230" || width < 230 || width < "230")
+          ) {
+            return toast.error("Image size must be 230X230 ");
+          }else{
+            setNFTFormValue({
+              ...NFTFormValue,
+              ...{ ["NFTOrginalImage"]: acceptedfile[0] },
+            });
+          }
+         
         }
         if (type == "Thump") {
           if (!validExtensionsthump.some((val) => fileNameExt === val)) {
@@ -306,10 +326,19 @@ export default function Create() {
                 validExtensionsthump.join(", ")
             );
           } else {
-            setNFTFormValue({
-              ...NFTFormValue,
-              ...{ ["NFTThumpImage"]: acceptedfile[0] },
-            });
+            const { width, height } = await loadImageFromFile(acceptedfile[0]);
+            if (
+              acceptedfile[0].type.includes("image") &&
+              (height < 230 || height < "230" || width < 230 || width < "230")
+            ) {
+              return toast.error("Image size must be 230X230 ");
+            }else{
+              setNFTFormValue({
+                ...NFTFormValue,
+                ...{ ["NFTThumpImage"]: acceptedfile[0] },
+              });
+            }
+            
           }
         }
       }
@@ -524,6 +553,7 @@ export default function Create() {
     return ValidateError;
   };
   //NFT Form submit function
+  console.log("numbernumber", number, number.length);
   const FormSubmit = async () => {
     SetValidateError({});
     const id = toast.loading("Validating Form");
@@ -534,11 +564,12 @@ export default function Create() {
       if (Object.values(key)?.length > 0) {
         for (var i = 0; i < number.length; i++) {
           if (!isEmpty(key[i]) && !isEmpty(Value[i])) {
-            NFTFormValue.NFTProperties.push({ [key[i]]: Value[i] });
+            // NFTFormValue.NFTProperties.push({ [key[i]]: Value[i] });
             checkarr.push({ [key[i]]: Value[i] });
           }
         }
       }
+      NFTFormValue.NFTProperties = checkarr;
       SetFormButton("process");
       let Resp = await nftNameValidation({
         NFTName: NFTFormValue.NFTName,
@@ -558,7 +589,7 @@ export default function Create() {
         // );
         // if (Statu == true) {
         //   SetApproveButton("stop");
-          SetUploadButton("start");
+        SetUploadButton("start");
         //   toast.update(id, {
         //     render: "Start Minting",
         //     type: "success",
@@ -646,17 +677,17 @@ export default function Create() {
     } = NFTFormValue;
     SetUploadButton("process");
     const id = toast.loading("Uploading  File");
-console.log("NFTCreatorNFTCreator",NFTCreator)
+    console.log("NFTCreatorNFTCreator", NFTCreator);
     var Resp;
-      Resp = await NFTImageUpload({
-        NFTCreator: NFTCreator ? NFTCreator : accountAddress,
-        NFTThumpImage,
-        NFTOrginalImage,
-        NFTName,
-        NFTDescription,
-        NFTProperties: JSON.stringify(NFTProperties),
-      });
-    console.log("ipfs response",Resp)
+    Resp = await NFTImageUpload({
+      NFTCreator: NFTCreator ? NFTCreator : accountAddress,
+      NFTThumpImage,
+      NFTOrginalImage,
+      NFTName,
+      NFTDescription,
+      NFTProperties: JSON.stringify(NFTProperties),
+    });
+    console.log("ipfs response", Resp);
 
     if (Resp?.success == "success") {
       setNFTFormValue({ ...NFTFormValue, ...Resp.data });
@@ -688,32 +719,13 @@ console.log("NFTCreatorNFTCreator",NFTCreator)
     // let ENc = window.btoa(JSON.stringify(_data));
     // console.log("sdfgghdfg", ENc);
 
-    const cont =  await solanaContractHook.mintNFT(
+    const cont = await solanaContractHook.mintNFT(
       accountAddress,
       NFTFormValue.MetaData,
       NFTFormValue.NFTName,
       NFTFormValue.NFTRoyalty,
       NFTFormValue.NFTQuantity
-    )
-
-    //  await solanaAction.mintNFT({metaIpfs : Config.IPFS + NFTFormValue.MetaData ,nftName : NFTFormValue.NFTName})
-    
-    // await ContractCall.minting_721_1155(
-    //   Config.IPFS + NFTFormValue.MetaData,
-    //   [  
-    //     NFTFormValue.NFTQuantity,
-    //     NFTFormValue.ContractType,
-    //     web3?.utils.toWei(NFTFormValue?.NFTRoyalty),
-    //     web3.utils.toWei(
-    //       (NFTFormValue?.PutOnSaleType == "FixedPrice"
-    //         ? NFTFormValue?.NFTPrice
-    //         : "0"
-    //       ).toString()
-    //     ),
-    //   ],
-    //   ENc
-    // );
-    // console.log("datainmincontractcall" , cont)
+    );
     if (cont) {
       if (NFTFormValue.PutOnSaleType === "TimedAuction") {
         _data.ClockTime = new Date(NFTFormValue.ClockTime);
@@ -727,15 +739,15 @@ console.log("NFTCreatorNFTCreator",NFTCreator)
         NFTFormValue?.ContractAddress
       }/${accountAddress}/${cont?.tokenCounts?.toString()}`;
 
-      let delegate; 
-      if(NFTFormValue.PutOnSaleType === "FixedPrice"){
-        delegate = await ApproveCallOrListCall()
-        console.log("🚀 ~ MintCall ~ delegate:", delegate)
-        _data.delegate = delegate
+      let delegate;
+      if (NFTFormValue.PutOnSaleType === "FixedPrice") {
+        delegate = await ApproveCallOrListCall();
+        console.log("🚀 ~ MintCall ~ delegate:", delegate);
+        _data.delegate = delegate;
       }
 
-      console.log("🚀 ~ MintCall ~ _data.delegate:", _data.delegate)
-      console.log("_data",_data)
+      console.log("🚀 ~ MintCall ~ _data.delegate:", _data.delegate);
+      console.log("_data", _data);
       let Resp = await CreateNFT(_data);
       toast.update(id, {
         render: Resp?.msg,
@@ -756,7 +768,7 @@ console.log("NFTCreatorNFTCreator",NFTCreator)
           closeButton: true,
           closeOnClick: true,
         });
-        modelClose()
+        modelClose();
         push(`/user/${userPayload?.CustomUrl}`, { state: { Tab: "owned" } });
       } else {
         toast.update(id, {
@@ -781,62 +793,37 @@ console.log("NFTCreatorNFTCreator",NFTCreator)
       setMintButton("try");
     }
   }
-
-
   const [BtnData, SetBtnData] = useState("start");
-
-//  const [approveData,setApproveData] = useState({
-//   NFTName: NFTFormValue.NFTName,
-//   ContractAddress: NFTFormValue.ContractAddress,
-//   ContractType: NFTFormValue.ContractType,
-//   CollectionNetwork: NFTFormValue.CollectionNetwork,
-//   OriginalImage: NFTFormValue.NFTOrginalImage,
-//   CompressedFile: NFTFormValue.CompressedFile,
-//   CompressedThumbFile: NFTFormValue.CompressedThumbFile,
-//   OriginalFile: NFTFormValue.NFTOrginalImageIpfs,
-//   NFTCreator: NFTFormValue.NFTCreator,
-//   NFTRoyalty: NFTFormValue.NFTRoyalty,
-//   NFTQuantity: NFTFormValue.NFTQuantity,
-//   Category: NFTFormValue.Category,
-//   NFTPrice: Tokens[TabName]?.myowner?.NFTPrice,
-//   CoinName: Tokens[TabName]?.myowner?.CoinName,
-//   PutOnSaleType: "FixedPrice",
-//   PutOnSale: true,
-//   NFTId : NFTFormValue.NFTId
-// })
-
   const ApproveCallOrListCall = async () => {
-    let id = toast.loading("Listing NFT")
-      let Respc = await solanaContractHook.Contract_Base_Validation();
-      if (!Respc) {
-        let Statu = await solanaContractHook.nftDelegateApprove(
-          accountAddress,
-          NFTFormValue.NFTId
-        );
-        if (Statu?.status == true) {
-          toast.update(id, {
-            render: "Ready To Place Order",
-            type: "success",
-            isLoading: false,
-            autoClose: 1000,
-            closeButton: true,
-            closeOnClick: true,
-          });
-          return Statu?.delegateSecKey
-        } else {
-         
-          toast.update(id, {
-            render: "Get APProve",
-            type: "success",
-            isLoading: false,
-            autoClose: 1000,
-            closeButton: true,
-            closeOnClick: true,
-          });
-          return ""
-        }
+    let id = toast.loading("Listing NFT");
+    let Respc = await solanaContractHook.Contract_Base_Validation();
+    if (!Respc) {
+      let Statu = await solanaContractHook.nftDelegateApprove(
+        accountAddress,
+        NFTFormValue.NFTId
+      );
+      if (Statu?.status == true) {
+        toast.update(id, {
+          render: "Ready To Place Order",
+          type: "success",
+          isLoading: false,
+          autoClose: 1000,
+          closeButton: true,
+          closeOnClick: true,
+        });
+        return Statu?.delegateSecKey;
+      } else {
+        toast.update(id, {
+          render: "Get APProve",
+          type: "success",
+          isLoading: false,
+          autoClose: 1000,
+          closeButton: true,
+          closeOnClick: true,
+        });
+        return "";
       }
-   
+    }
   };
 
   console.log("NFTFormValue-->", NFTFormValue);
@@ -953,7 +940,9 @@ console.log("NFTCreatorNFTCreator",NFTCreator)
                       <input
                         type="text"
                         id="NFTPrice"
-                        onChange={onChange}
+                        onChange={(e) => {
+                          FormValue?.NFTPrice.length < 7 && onChange(e);
+                        }}
                         value={NFTFormValue.NFTPrice}
                         max={7}
                         className="w-full rounded-lg border-jacarta-100 py-3 hover:ring-2 hover:ring-accent/10 focus:ring-accent dark:border-jacarta-600 dark:bg-jacarta-700 dark:text-white dark:placeholder:text-jacarta-300"
@@ -989,9 +978,11 @@ console.log("NFTCreatorNFTCreator",NFTCreator)
                   </div>
                   {NFTFormValue.PutOnSaleType == "FixedPrice" && pricetype && (
                     <>
-                      <div className="dark:text-jacarta-300">Service Fees 2.5%</div>
                       <div className="dark:text-jacarta-300">
-                        You will receive ETH
+                        Service Fees 2.5%
+                      </div>
+                      <div className="dark:text-jacarta-300">
+                        You will receive {Config.COIN_NAME}
                       </div>
                     </>
                   )}
@@ -1155,9 +1146,14 @@ console.log("NFTCreatorNFTCreator",NFTCreator)
               <input
                 type="number"
                 id="NFTRoyalty"
+                pattern="^[0-9]*$"
                 className="w-full rounded-lg border-jacarta-100 py-3 hover:ring-2 hover:ring-accent/10 focus:ring-accent dark:border-jacarta-600 dark:bg-jacarta-700 dark:text-white dark:placeholder:text-jacarta-300"
                 placeholder="Eg.5"
-                onChange={onChange}
+                onChange={(e) => {
+                  !e.target.value.includes(".") &&
+                    e.target.value < 21 &&
+                    onChange(e);
+                }}
                 value={NFTFormValue?.NFTRoyalty}
               />
             </div>
@@ -1189,7 +1185,10 @@ console.log("NFTCreatorNFTCreator",NFTCreator)
                           ></path>
                         </svg>
                         {key[index]} : {Value[index]}
-                        <span onClick={() => RemoveProperties(index)}  className="cursor-pointer">
+                        <span
+                          onClick={() => RemoveProperties(index)}
+                          className="cursor-pointer"
+                        >
                           <svg
                             width="0"
                             height="0"
@@ -1255,6 +1254,13 @@ console.log("NFTCreatorNFTCreator",NFTCreator)
           ></button>
         </div>
       </div>
+      {/* <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                  ref={modelref}
+                ></button> */}
       {/* MODEL */}
       <CreateModal
         modelref={modelref}

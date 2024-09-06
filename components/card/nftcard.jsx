@@ -11,17 +11,20 @@ import ImgAudVideo from "../common/imgvdo";
 import Config from "@/Config/config";
 import { LikeRef } from "../common/LikeRef";
 import { isEmpty } from "@/actions/common";
+import { Wallet } from "@project-serum/anchor";
 
 export default function Nftcard({
   datas,
   product,
   index,  
+  from,
+  setStatechange,
   LikeList,
   LikedTokenList,
   setLikedTokenList,
   LikeForwardRef,
 }) {
-  console.log("product-->", product);
+  console.log("product-->", product,product?.cur_owner_Profile);
   const payload = useSelector(
     (state) => state.LoginReducer.AccountDetails
   );
@@ -55,12 +58,15 @@ export default function Nftcard({
         closeButton: true,
         closeOnClick: true,
       });
+      
     } else
       toast.error("Connect Wallet", {
         autoClose: 1000,
         closeButton: true,
         closeOnClick: true,
       });
+
+      setStatechange()
   };
 
   let renderer = ({ days, hours, minutes, seconds, completed }) => {
@@ -85,6 +91,25 @@ export default function Nftcard({
   let formatTime = (time) => {
     return String(time).padStart(2, "0");
   };
+
+  const isObject  = (data)=>{
+return typeof data === 'object'
+  }
+
+ const  isObjectCreator_WalletAddress = (data , value )=>{
+  if(isObject(data)){
+    return data?.[value]
+  }
+return data
+
+ }
+//  const  isObjectCreator_WalletAddress = (data)=>{
+//   if(isObject(data)){
+//     return product?.Creator_WalletAddress.WalletAddress
+//   }
+// return product?.Creator_WalletAddress
+
+//  }
 
   return (
     <div className="block rounded-2.5xl border border-jacarta-100 bg-white p-[1.1875rem] transition-shadow hover:shadow-lg dark:border-jacarta-700 dark:bg-jacarta-700 h-full">
@@ -144,51 +169,19 @@ export default function Nftcard({
                   <path fill="none" d="M0 0H24V24H0z" />
                   <path d="M12.001 4.529c2.349-2.109 5.979-2.039 8.242.228 2.262 2.268 2.34 5.88.236 8.236l-8.48 8.492-8.478-8.492c-2.104-2.356-2.025-5.974.236-8.236 2.265-2.264 5.888-2.34 8.244-.228zm6.826 1.641c-1.5-1.502-3.92-1.563-5.49-.153l-1.335 1.198-1.336-1.197c-1.575-1.412-3.99-1.35-5.494.154-1.49 1.49-1.565 3.875-.192 5.451L12 18.654l7.02-7.03c1.374-1.577 1.299-3.959-.193-5.454z" />
                 </svg>
-           {/* {
-            (LikedTokenList?.some(
-                                (value) => value.NFTId === product.NFTId
-                              ) ? (
-                                
-                                <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                width="24"
-                                height="24"
-                                className="h-4 w-4 fill-jacarta-500 fill-red dark:fill-jacarta-200 dark:hover:fill-red"
-                             >
-        
-                                <path fill="none" d="M0 0H24V24H0z"></path>
-                                <path d="M12.001 4.529c2.349-2.109 5.979-2.039 8.242.228 2.262 2.268 2.34 5.88.236 8.236l-8.48 8.492-8.478-8.492c-2.104-2.356-2.025-5.974.236-8.236 2.265-2.264 5.888-2.34 8.244-.228zm6.826 1.641c-1.5-1.502-3.92-1.563-5.49-.153l-1.335 1.198-1.336-1.197c-1.575-1.412-3.99-1.35-5.494.154-1.49 1.49-1.565 3.875-.192 5.451L12 18.654l7.02-7.03c1.374-1.577 1.299-3.959-.193-5.454z"></path>
-                              </svg>
-                              ) :    
-                                 <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                width="24"
-                                height="24"
-                                className="h-4 w-4 fill-jacarta-500 hover:fill-red dark:fill-jacarta-200 dark:hover:fill-red"
-                             >
-        
-                                <path fill="none" d="M0 0H24V24H0z"></path>
-                                <path d="M12.001 4.529c2.349-2.109 5.979-2.039 8.242.228 2.262 2.268 2.34 5.88.236 8.236l-8.48 8.492-8.478-8.492c-2.104-2.356-2.025-5.974.236-8.236 2.265-2.264 5.888-2.34 8.244-.228zm6.826 1.641c-1.5-1.502-3.92-1.563-5.49-.153l-1.335 1.198-1.336-1.197c-1.575-1.412-3.99-1.35-5.494.154-1.49 1.49-1.565 3.875-.192 5.451L12 18.654l7.02-7.03c1.374-1.577 1.299-3.959-.193-5.454z"></path>
-                              </svg>
-                                
-                                )} */}
           </span>
-          {/* <span className="text-sm dark:text-jacarta-200">
-            {datas?.likes ?? "0"}
-          </span> */}
+          
         </div>
         <div className="absolute left-3 -bottom-3">
           <div className="flex -space-x-2">
-            <a href={`${'/user'}${'/'}${product?.Creator_WalletAddress}`}>
+            <a href={`${'/user'}${'/'}${isObjectCreator_WalletAddress(product?.Creator_WalletAddress , "WalletAddress")}`}>
               <Image
                 width={20}
                 height={20}
                 src={
                   isEmpty(product?.Creator_Profile)
                     ? "/img/avatars/owner_1.png"
-                    : `${Config?.IMG_URL}/user/${product?.Creator_WalletAddress}/profile/${product?.Creator_Profile}`
+                    : `${Config?.IMG_URL}/user/${isObjectCreator_WalletAddress(product?.Creator_WalletAddress , "WalletAddress") }/profile/${isObjectCreator_WalletAddress(product?.Creator_Profile, "Profile")}`
                 }
                 alt="creator"
                 className="h-6 w-6 rounded-full border-2 border-white hover:border-accent dark:border-jacarta-600 dark:hover:border-accent"
@@ -200,6 +193,12 @@ export default function Nftcard({
                 width={20}
                 height={20}
                 src={
+                  from == "myItem" ?
+                  isEmpty(product?.Creator_Profile) ?
+                  "/img/avatars/owner_1.png"
+                  :
+                  `${Config?.IMG_URL}/user/${isObjectCreator_WalletAddress(product?.Creator_WalletAddress , "WalletAddress") }/profile/${isObjectCreator_WalletAddress(product?.Creator_Profile, "Profile")}`
+                  :
                   isEmpty(product?.cur_owner_Profile)
                     ? "/img/avatars/owner_1.png"
                     : `${Config?.IMG_URL}/user/${product?.NFTOwner}/profile/${product?.cur_owner_Profile}`
@@ -220,40 +219,7 @@ export default function Nftcard({
             {product?.NFTName}
           </span>
         </Link>
-        {/* <div className="dropup rounded-full hover:bg-jacarta-100 dark:hover:bg-jacarta-600">
-          <a
-            href="#"
-            className="dropdown-toggle inline-flex h-8 w-8 items-center justify-center text-sm"
-            role="button"
-            id="itemActions"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            <svg
-              width="16"
-              height="4"
-              viewBox="0 0 16 4"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className="fill-jacarta-500 dark:fill-jacarta-200"
-            >
-              <circle cx="2" cy="2" r="2" />
-              <circle cx="8" cy="2" r="2" />
-              <circle cx="14" cy="2" r="2" />
-            </svg>
-          </a>
-          <div
-            className="dropdown-menu dropdown-menu-end z-10 hidden min-w-[200px] whitespace-nowrap rounded-xl bg-white py-4 px-2 text-left shadow-xl dark:bg-jacarta-800"
-            aria-labelledby="itemActions"
-          >
-            <button className="block w-full rounded-xl px-5 py-2 text-left font-display text-sm transition-colors hover:bg-jacarta-50 dark:text-white dark:hover:bg-jacarta-600">
-              Share
-            </button>
-            <button className="block w-full rounded-xl px-5 py-2 text-left font-display text-sm transition-colors hover:bg-jacarta-50 dark:text-white dark:hover:bg-jacarta-600">
-              Report
-            </button>
-          </div>
-        </div> */}
+        
       </div>
      <div className="mt-2 text-sm flex items-center justify-between">
      {product?.NFTPrice &&  product?.NFTPrice !== "0" && <span className="flex items-center whitespace-nowrap rounded-md border border-jacarta-100 py-1 px-2 dark:border-jacarta-600">
@@ -269,12 +235,12 @@ export default function Nftcard({
           </span>
           {console.log("pxxxroduct" , product)}
       <span className="text-sm font-medium tracking-tight text-green">
-          {product?.NFTPrice} SOL
+          {product?.NFTPrice} {product?.CoinName}
           </span>
           </span>}
 
         <span className="mr-1 text-jacarta-700 dark:text-jacarta-200">
-          {/* {isEmpty(product?.PutOnSale) ? product?.PutOnSaleType == "UnlimitedAuction" ? product?.PutOnSaleType : product?.PutOnSaleType == "Fixed" :  } {} */}
+          {/* {isEmpty(product?.PutOnSale) ? product?.PutOnSaleType == "UnlimitedAuction" ? product?.PutOnSaleType : product?.PutOnSaleType == "Fixed" : "" } {} */}
         </span>
 
 

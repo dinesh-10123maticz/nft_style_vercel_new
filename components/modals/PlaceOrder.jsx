@@ -580,6 +580,11 @@ export default function PlaceOrder({
   //     else if (e.value == "Scheduled Listing") SetOpenPopup("EndClockTime");
   //   }
   // };
+
+
+  const closemodel = ()=>{
+    closeref.current.click()
+  }
   return (
     <div>
       <div
@@ -700,7 +705,7 @@ export default function PlaceOrder({
                       <input
                         type="text"
                         id="NFTPrice"
-                        onChange={onChange}
+                        onChange={(e)=>{FormValue?.NFTPrice.length < 7 && onChange(e)}}
                         value={FormValue?.NFTPrice}
                         className="w-full rounded-lg border-jacarta-100 py-3 hover:ring-2 hover:ring-accent/10 focus:ring-accent dark:border-jacarta-600 dark:bg-jacarta-700 dark:text-white dark:placeholder:text-jacarta-300"
                         placeholder=""
@@ -731,8 +736,8 @@ export default function PlaceOrder({
                       </div>
                     </div>
                   </div>
-                  <div className="dark:text-jacarta-300">Service Fees {String(0)}%</div>
-                  <div className="dark:text-jacarta-300">You will receive ETH</div>
+                  {/* <div className="dark:text-jacarta-300">Service Fees {String(0)}%</div>
+                  <div className="dark:text-jacarta-300">You will receive SOL</div> */}
                 </div>
               ) : (
                 <div className="mb-4">
@@ -841,6 +846,8 @@ export default function PlaceOrder({
                 {BtnData == "done" && "Done"}
               </button>
               <button  type="button"
+                data-bs-dismiss="modal"
+                aria-label="Close"
                   className="rounded-full bg-accent py-3 px-8 text-center font-semibold text-white shadow-accent-volume transition-all hover:bg-accent-dark" onClick={closePop}>
                 Cancel
               </button>

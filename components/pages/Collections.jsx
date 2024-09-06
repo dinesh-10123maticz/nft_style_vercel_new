@@ -286,12 +286,13 @@ export default function Collections({ params }) {
           ))} */}
         </div>
         <div class="mt-8 flex items-center justify-center">
-          <button
+          {Tokens[TabName]?.loader &&
+          (<button
             class="w-40 rounded-full bg-accent py-3 px-8 text-center font-semibold text-white shadow-accent-volume transition-all hover:bg-accent-dark"
             onClick={LoadMore}
           >
             Load More
-          </button>
+          </button>)}
         </div>
       </div>
     </section>

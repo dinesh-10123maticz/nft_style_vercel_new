@@ -320,10 +320,10 @@ export default function Header1() {
                       </div>
                     )} */}
                     {console.log("Searchdata.user?.msg", Searchdata.user?.msg)}
-                    {Searchdata.user?.msg?.length > 0 && (
+                    { (Array.isArray(Searchdata.user?.msg) &&  Searchdata.user?.msg?.length > 0) && (
                       <div className="content">
                         <h6 className="pTag fw-600">Users</h6>
-                        {Searchdata.user?.msg.map((value) => (
+                        {Searchdata.user?.msg?.map((value) => (
                           <>
                             <div
                               className="searchset justify-content-start pt-4 searchCursor cursor-pointer"
@@ -474,11 +474,7 @@ export default function Header1() {
                   <path d="M18.031 16.617l4.283 4.282-1.415 1.415-4.282-4.283A8.96 8.96 0 0 1 11 20c-4.968 0-9-4.032-9-9s4.032-9 9-9 9 4.032 9 9a8.96 8.96 0 0 1-1.969 5.617zm-2.006-.742A6.977 6.977 0 0 0 18 11c0-3.868-3.133-7-7-7-3.868 0-7 3.132-7 7 0 3.867 3.132 7 7 7a6.977 6.977 0 0 0 4.875-1.975l.15-.15z" />
                 </svg>
               </span>
-              <div
-                className={
-                  searchbottom ? "search-model" : "search-model kr_align"
-                }
-              >
+              <div className={searchbottom ? "search-model" : "search-model kr_align"}>
                 {console.log("Searchdata22222",Searchdata)}
                 {val && (
                   <div className="contentTop" id="smc-modal">
@@ -516,10 +512,10 @@ export default function Header1() {
                             ))}
                           </div>
                         )} */}
-                        {Searchdata.user?.msg?.length > 0 && (
+                        {(Array.isArray(Searchdata.user?.msg) &&  Searchdata.user?.msg?.length > 0) && (
                           <div className="content">
                             <h6 className="pTag fw-600">Users</h6>
-                            {Searchdata.user?.msg.map((value) => (
+                            {Searchdata.user?.msg?.map((value) => (
                               <>
                                 <div
                                   className="searchset pt-4 searchCursor"
@@ -548,10 +544,10 @@ export default function Header1() {
                           </div>
                         )}
 
-                        {Searchdata.token?.data?.length > 0 && (
+                        {Searchdata?.token?.data?.length > 0 && (
                           <div className="content">
                             <h6 className="pTag fw-600">Tokens</h6>
-                            {Searchdata.token?.data.map((value) => (
+                            {Searchdata?.token?.data?.map((value) => (
                               <>
                                 <div
                                   className="searchset pt-4 searchCursor"

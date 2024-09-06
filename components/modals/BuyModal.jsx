@@ -58,13 +58,12 @@ console.log("itemaaaaaaaaa",item)
   const decimal = currency?.filter((item) => item.label === owner.CoinName)?.pop()?.decimal ??   18;
   const token_address = currency?.filter((item) => item.label === owner.CoinName)?.pop()?.address ??  Config.DEADADDRESS;
   const YouWillGet = useMemo(() => {
-    return
-    //  ContractCall.buy_bid_price_calculation(
-    //   (owner.NFTPrice * NFTQuantity).toString(),
-    //   decimal.toString()
-    // );
+    return (Number(owner.NFTPrice) * Number(NFTQuantity))
   }, [owner.TokenPrice, NFTQuantity]);
 
+  const totalPrice = useMemo(()=>{
+    Number(NFTQuantity) * Number(owner?.NFTPrice)
+  },[NFTQuantity])
 
   const Validation = async () => {
     var error = {};
@@ -309,29 +308,29 @@ console.log("itemaaaaaaaaa",item)
   //   BalanceCheck();
   // }, [item, owner]);
 
-  async function BalanceCheck() {
-    // SetBtn("process");
-    // setOnce(false)
-    if(once){
-      console.log("Onnnn",once);
-      let Nftbalance = await ContractCall.Current_NFT_Balance(owner, item);
-      console.log("Balanance",owner,item)
-      console.log("ownneerrsnftbusdasdynowbalittemmm", Nftbalance , owner?.NFTBalance , Nftbalance , owner?.NFTOwner , item.ContractType  , owner?.NFTOwner);
+  // async function BalanceCheck() {
+  //   // SetBtn("process");
+  //   // setOnce(false)
+  //   if(once){
+  //     console.log("Onnnn",once);
+  //     let Nftbalance = await ContractCall.Current_NFT_Balance(owner, item);
+  //     console.log("Balanance",owner,item)
+  //     console.log("ownneerrsnftbusdasdynowbalittemmm", Nftbalance , owner?.NFTBalance , Nftbalance , owner?.NFTOwner , item.ContractType  , owner?.NFTOwner);
       
-      if ((Number(Nftbalance) != Number(owner?.NFTBalance) &&  item.ContractType == '1155' ) || ( Nftbalance.toLowerCase() !=  owner?.NFTOwner.toLowerCase()  &&  item.ContractType == '721') ) {
+  //     if ((Number(Nftbalance) != Number(owner?.NFTBalance) &&  item.ContractType == '1155' ) || ( Nftbalance.toLowerCase() !=  owner?.NFTOwner.toLowerCase()  &&  item.ContractType == '721') ) {
        
   
-        toast.warning("You won't buy at this moment please refresh you data");
-        setTimeout(() => {
-          push("/");
-        }, 1000);
-      }
+  //       toast.warning("You won't buy at this moment please refresh you data");
+  //       setTimeout(() => {
+  //         push("/");
+  //       }, 1000);
+  //     }
      
-    }
-    SetBtn("start");
-    return ()=>{ setOnce(false)}
+  //   }
+  //   SetBtn("start");
+  //   return ()=>{ setOnce(false)}
     
-  }
+  // }
 
   return (
     <div
@@ -388,17 +387,17 @@ console.log("itemaaaaaaaaa",item)
               <span className="font-display text-sm font-semibold text-jacarta-700 dark:text-white">Price :</span>
               <span className="font-displaytext-sm dark:text-jacarta-200"> {owner?.NFTPrice} {owner?.CoinName}</span>
             </div>
-            <div className="mb-2 flex items-center justify-between">
+            {/* <div className="mb-2 flex items-center justify-between">
               <span className="font-display text-sm font-semibold text-jacarta-700 dark:text-white">Service Fee :</span>
               <span className="font-displaytext-sm dark:text-jacarta-200"> {String(buyerFees)} % {owner.CoinName}</span>
-            </div>
-            <div className="mb-2 flex items-center justify-between">
+            </div> */}
+            {/* <div className="mb-2 flex items-center justify-between">
               <span className="font-display text-sm font-semibold text-jacarta-700 dark:text-white">Royalty Fee :</span>
               <span className="font-displaytext-sm dark:text-jacarta-200"> {item.NFTRoyalty} % {owner.CoinName}</span>
-            </div>
+            </div> */}
             <div className="mb-2 flex items-center justify-between">
               <span className="font-display text-sm font-semibold text-jacarta-700 dark:text-white">You Will Pay :</span>
-              <span className="font-displaytext-sm dark:text-jacarta-200"> 2.03000</span>
+              <span className="font-displaytext-sm dark:text-jacarta-200"> {YouWillGet} {owner.CoinName} </span>
             </div>
              </div>
              <div className="mb-[15px]">

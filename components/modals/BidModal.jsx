@@ -2,11 +2,14 @@ import { useEffect, useMemo, useState } from "react";
 
 //npm
 import { useSelector } from "react-redux";
+import Select from 'react-select'
 
 //function
-import { isEmpty } from "@/actions/common";
+import { Decryptdata, isEmpty } from "@/actions/common";
 import Config from '@/Config/config'
 import { BidApprove } from "@/actions/axios/nft.axios";
+import SolanacontractHook from "@/utlis/hooks/solanaContractHook"
+import { toast } from "react-toastify";
 // import useContractProviderHook from "@/utlis/hooks/contractProviderHook";
 
 
@@ -20,16 +23,19 @@ const collcections = [
     id: 2,
     name: "Sol"
   },
- 
-
 ];
-const Currency = "BNB"
-const Coin = "WBNB"
+
+const Currency = "SOL"
+const Coin = "DHINA"
+
 export default function BidModal({   bidder, bid, owner, item ,closePop }) {
-  // const ContractCall = useContractProviderHook()
+  const ContractCall = SolanacontractHook()
   const { currency } = useSelector(state => state.LoginReducer)
+  const { payload } = useSelector(state => state.LoginReducer.User)
   const { web3, accountAddress, coinBalance } = useSelector(state => state.LoginReducer.AccountDetails);
   const [TokenBal, SetTokenBal] = useState(0)
+  const [Error, SetError] = useState({})
+  const [Tokens , setTokens] = useState({})
   const [ Once , setOnce] = useState(true)
   const [Btn, SetBtn] = useState('start')
   const [FormValue, SetFormValue] = useState({
@@ -46,7 +52,8 @@ export default function BidModal({   bidder, bid, owner, item ,closePop }) {
         currency?.filter(item => item.address != Config.DEADADDRESS)?.length > 0 ?
           currency.filter(item => item.address !== Config.DEADADDRESS)[0].label
           : Coin
-        : bidder.CoinName : owner?.CoinName
+        : bidder.CoinName : owner?.CoinName,
+    Delegate : isEmpty(bidder) ? null : bidder.delegate
   })
   const Token_details = useMemo(() => {
     var data = currency?.filter(item => item.label === FormValue.CoinName)?.pop() ?? currency?.filter(item => item.label !== Currency)?.pop()
@@ -54,15 +61,39 @@ export default function BidModal({   bidder, bid, owner, item ,closePop }) {
       decimal: data?.decimal ?? 18,
       token_address: data?.address ?? Config.DEADADDRESS
     }
-  },[FormValue.CoinName])
+  },[item]) 
 
-  // useEffect(() => {
-  //   BalCal()
-  // }, [])
+  useEffect(()=>{
+    setTokens(currency.filter(val=>val.address !== Config.DEADADDRESS).pop())
+  },[currency])
 
-  const BalCal = async () => {
-    let TokenBal = await ContractCall.Token_Balance_Calculation(Token_details.token_address, accountAddress)
-    SetTokenBal(TokenBal)
+  const totalPay = useMemo(()=> Number(FormValue?.TokenBidAmt) * Number(FormValue?.NFTQuantity) ,[FormValue?.TokenBidAmt,FormValue?.NFTQuantity,item] )
+
+  useEffect(() => {
+    SetFormValue({
+      TokenBidderAddress: accountAddress,
+      Category: item.Category,
+      NFTQuantity: isEmpty(bidder) ? 1 : bidder.NFTQuantity,
+      TokenBidAmt: isEmpty(bidder) ? 0 : bidder.TokenBidAmt,
+      NFTId: item.NFTId,
+      ContractAddress: item.ContractAddress,
+      ContractType: item.ContractType,
+      CollectionNetwork: item.CollectionNetwork,
+      CoinName: (isEmpty(owner?.CoinName) || owner?.PutOnSaleType != "TimedAuction") ?
+        isEmpty(bidder) ?
+          currency?.filter(item => item.address != Config.DEADADDRESS)?.length > 0 ?
+            currency.filter(item => item.address !== Config.DEADADDRESS)[0].label
+            : Coin
+          : bidder.CoinName : owner?.CoinName,
+      Delegate : isEmpty(bidder) ? null : bidder.delegate
+    })
+      BalCal()
+  }, [item])
+
+  const BalCal = async (data) => {
+    const {tokenBalance, Decimal} = await ContractCall.getTokenbalance(accountAddress,Token_details.token_address)
+    console.log("🚀 ~ BalCal ~ tokenBalance:", tokenBalance)
+    SetTokenBal(tokenBalance)
   }
   const Validation = async () => {
     var Error = {}
@@ -77,7 +108,7 @@ export default function BidModal({   bidder, bid, owner, item ,closePop }) {
     else if (owner?.PutOnSaleType === "TimedAuction") {
       if (FormValue.TokenBidAmt < Number(owner.NFTPrice)) Error.TokenBidAmt = "Minimum Bid is " + owner.NFTPrice
     }
-    if (TokenBal <= 0) Error.TokenBal = "Not Enough token in your Wallet"
+    if (TokenBal <= 0 || TokenBal < totalPay) Error.TokenBal = "Not Enough token in your Wallet"
     return Error
   }
 
@@ -86,7 +117,6 @@ export default function BidModal({   bidder, bid, owner, item ,closePop }) {
     SetError({})
     SetBtn('process')
     var error = await Validation()
-    // console.log('RFGSFGRG',error)
     if (!isEmpty(error)) {
       setTimeout(() => {
       toast.update(id, { render: Object.values(error)[0], type: 'error', isLoading: false, autoClose: 1000, closeButton: true, closeOnClick: true })
@@ -96,13 +126,10 @@ export default function BidModal({   bidder, bid, owner, item ,closePop }) {
       SetError(error)
     }
     else {
-      let allow = web3.utils.fromWei((await ContractCall.allowance_721_1155(Token_details.token_address, accountAddress)) ? String(await ContractCall.allowance_721_1155(Token_details.token_address, accountAddress)) : '0')
+      // let allow = web3.utils.fromWei((await ContractCall.allowance_721_1155(Token_details.token_address, accountAddress)) ? String(await ContractCall.allowance_721_1155(Token_details.token_address, accountAddress)) : '0')
       // console.log('fhfhfa',Token_details,accountAddress,Number(allow))
-      console.log("YouWillGet", YouWillGet, allow, String(Number(YouWillGet) + Number(allow)));
-      let cont = await ContractCall.approve_721_1155(Token_details.token_address, network[Network].tradeContract, web3.utils.toWei(String(Number(YouWillGet) + Number(allow))))
-      console.log('====================================');
-      console.log("APProve data");
-      console.log('====================================');
+      // console.log("YouWillGet", YouWillGet, allow, String(Number(YouWillGet) + Number(allow)));
+      let cont = await ContractCall.Bid(accountAddress,Token_details?.token_address,Token_details?.decimal,totalPay,(isEmpty(bidder) ? null : Decryptdata(delegate) ))
       if (cont) {
 
         var _data = FormValue
@@ -111,8 +138,8 @@ export default function BidModal({   bidder, bid, owner, item ,closePop }) {
         _data.from = isEmpty(bidder) ? 'Bid' : 'Edit'
         _data.activity = isEmpty(bidder) ? 'Bid' : 'Edit'
         _data.EmailId = payload.EmailId
-        _data.click = `${config.FRONT_URL}/info/${item.CollectionNetwork}/${item.ContractAddress}/${owner.NFTOwner}/${owner.NFTId}`
-
+        _data.click = `${Config.FRONT_URL}/info/${item.CollectionNetwork}/${item.ContractAddress}/${owner.NFTOwner}/${owner.NFTId}`
+        _data.delegate = cont.delegate
         var Resp = await BidApprove(_data)
         console.log("BACKAPPROVE", Resp);
         if (Resp.success == 'success') {
@@ -144,7 +171,7 @@ export default function BidModal({   bidder, bid, owner, item ,closePop }) {
     let val = (data === "price") ? "CoinName" : id
     SetFormValue({ ...FormValue, ...{ [val]: data === "inp" ? (name == "NumDotOnly" ? NumANdDotOnly(value) : NumberOnly(value)) : value } })
     if (data === "price") {
-      // BalCal(value)
+      BalCal(value)
     }
   }
 
@@ -222,13 +249,13 @@ export default function BidModal({   bidder, bid, owner, item ,closePop }) {
                   id="TokenBidAmt"
                   className="h-12 w-full flex-[3] border-0 focus:ring-inset focus:ring-accent"
                   placeholder="Amount"
-                  defaultValue="0.05"
+                  value={FormValue.TokenBidAmt}
                 />
 
              
               </div>
               </div>
-              <div className="dropdown my-1 cursor-pointer">
+              {/* <div className="dropdown my-1 cursor-pointer">
                 <div
                   className="dropdown-toggle flex items-center justify-between rounded-lg border border-jacarta-100 bg-white py-3 px-3 dark:border-jacarta-600 dark:bg-jacarta-700 dark:text-jacarta-300"
                   role="button"
@@ -261,7 +288,19 @@ export default function BidModal({   bidder, bid, owner, item ,closePop }) {
                     ))}
                   </ul>
                 </div>
-              </div>
+              </div> */}
+              <Select
+                  value={{ label: FormValue.CoinName, value: FormValue.CoinName }}
+                  defaultValue={{ label: FormValue.CoinName, value: FormValue.CoinName }}
+                  className="select_custom"
+                  onChange={(e) => { onChange(e, 'price') }}
+                  options={currency?.filter(item => item.label != Config.COIN_NAME)}
+                  id='CoinName'
+                  isSearchable={false}
+                  classNamePrefix="react-select"
+                  isDisabled={owner?.PutOnSaleType == "TimedAuction"}
+
+                />
               <div className="mb-[15px]">
               <div className="mb-2 flex items-center justify-between">
                 <span className="font-display text-sm font-semibold text-jacarta-700 dark:text-white">
@@ -278,6 +317,7 @@ export default function BidModal({   bidder, bid, owner, item ,closePop }) {
                   onChange={(e)=>onChange(e)}
                   className="h-12 w-full flex-[3] border-0 focus:ring-inset focus:ring-accent"
                   placeholder="Amount"
+                  disabled={owner.NFTBalance == '1' || owner.NFTBalance == 1 ? true : false}
                   defaultValue="1"
                 />
 
@@ -296,15 +336,15 @@ export default function BidModal({   bidder, bid, owner, item ,closePop }) {
                 </div>
                 <div className="flex justify-between flex-row w-100 mb-[5px]">
                   <div className="text-sm font-semibold text-jacarta-600  dark:text-white">Your Bidding balance:</div>
-                  <div className="text-sm font-normal text-jacarta-600  dark:text-accent-light">0 Cake</div>
+                  <div className="text-sm font-normal text-jacarta-600  dark:text-accent-light">{TokenBal} {FormValue.CoinName}</div>
                 </div>
                 <div className="flex justify-between flex-row w-100 mb-[5px]">
                   <div className="text-sm font-semibold text-jacarta-600  dark:text-white">Service fee:</div>
-                  <div className="text-sm font-normal text-jacarta-600  dark:text-accent-light">2.5% Cake</div>
+                  <div className="text-sm font-normal text-jacarta-600  dark:text-accent-light">2.5% {FormValue.CoinName}</div>
                 </div>
                 <div className="flex justify-between flex-row w-100 mb-[5px]">
                   <div className="text-sm font-semibold text-jacarta-600  dark:text-white">You will Pay:</div>
-                  <div className="text-sm font-normal text-jacarta-600  dark:text-accent-light">0 Cake</div>
+                  <div className="text-sm font-normal text-jacarta-600  dark:text-accent-light">{totalPay} {FormValue.CoinName}</div>
                 </div>
               
               </div>

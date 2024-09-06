@@ -81,6 +81,9 @@ module.exports = {
       "7xl": ["4.25rem", { lineHeight: "normal" }],
     },
     extend: {
+      width: {
+        'fill': '-webkit-fill-available', // Adds the width class 'w-fill'
+      },
       borderRadius: {
         "2lg": "0.625rem",
         "2.5xl": "1.25rem",

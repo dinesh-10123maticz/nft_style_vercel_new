@@ -77,7 +77,7 @@ export default function FileUpload({ onChange , userPayload , NFTFormValue}) {
       </label>
       <div className="mb-3 text-2xs dark:text-jacarta-300">
         {!imageName ? (
-          "Drag or choose your file to upload"
+          "Drag or choose your file to upload (image size Must be 230X230)"
         ) : (
           <span className="text-green">Successfully Uploaded {imageName}</span>
         )}
@@ -151,7 +151,7 @@ type={
                 width={20}
                 height={20}
                 src={
-                  isEmpty(userPayload)
+                  isEmpty(userPayload?.Profile)
                     ? '/img/avatars/owner_1.png'
                     : `${Config?.IMG_URL}/user/${userPayload?.WalletAddress}/profile/${userPayload?.Profile}`
                 }
@@ -200,7 +200,7 @@ type={
      </div>
 
     {/* Thumbnail Preview */}
-    { (file?.type?.includes('video') || file?.types?.includes('audio')) &&
+    { (file?.type?.includes('video') || file?.type?.includes('audio')) &&
      <div className="grid grid-cols-2 gap-3 flex-row flex-wrap flex max-[767px]:grid-cols-1 mb-4">
       <div
         onDragEnter={handleDragEnter}
@@ -246,7 +246,7 @@ type={
         />
       </div>
       <div>
-      <div className="pTag" > Thumbnail Preview</div>
+      <div className="pTag" > Thumbnail Preview (image size Must be 230X230)</div>
       <div className="block rounded-2.5xl w-[320px] border border-jacarta-100 bg-white p-[1.1875rem] transition-shadow hover:shadow-lg dark:border-jacarta-700 dark:bg-jacarta-700">
       <figure className="relative">
           <Image

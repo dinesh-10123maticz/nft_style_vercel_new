@@ -130,9 +130,9 @@ else if (EnvName === "demossl") {
 }
 else {
     key.FRONT_URL = 'http://localhost:3000/'
-    key.BACK_URL = 'http://192.53.121.26:7017/v1/front/'
-    key.ADMIN_URL = 'http://192.53.121.26:7017/v1/admin'
-    key.IMG_URL = 'http://192.53.121.26:7017'
+    key.BACK_URL = 'http://localhost:5001/v1/front/'
+    key.ADMIN_URL = 'http://localhost:5001/v1/admin'
+    key.IMG_URL = 'http://localhost:5001'
     key.DEADADDRESS = '0x000000000000000000000000000000000000dEaD'.toLowerCase()
     key.profile         =    "/img/avatars/owner_1.png"
     key.TradeContract = '0x600A3fEed87E3a2f9EFe61eAd7F1dAe8eA60a59d'.toLowerCase()

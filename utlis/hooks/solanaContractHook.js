@@ -23,20 +23,7 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
   createApproveInstruction,
-  // decodeInstructionData,
-  createMint,
-  mintTo,
-  approveChecked,
-  getAccount,
-  getOrCreateAssociatedTokenAccount,
-  MintLayout,
-  createMintToInstruction,
-  getMinimumBalanceForRentExemptMint,
   getAssociatedTokenAddressSync,
-  createInitializeMint2Instruction,
-  TOKEN_2022_PROGRAM_ID,
-  createInitializeMintInstruction,
-  approveCheckedInstructionData,
 } from "@solana/spl-token";
 
 /* Solana Wallet Adapters */
@@ -236,6 +223,8 @@ export default function Usewallet() {
    */
 
   const getTokenbalance = async (walletAddress, tokenAddress) => {
+    try{
+    console.log("🚀 ~ getTokenbalance ~ walletAddress, tokenAddress:", walletAddress, tokenAddress)
     let tokenBalance = 0;
     let Decimal = 0;
     const response = await axios({
@@ -274,6 +263,9 @@ export default function Usewallet() {
           ?.tokenAmount?.decimals;
     }
     return { tokenBalance, Decimal };
+  }catch(err){
+    return { tokenBalance : 0, Decimal : 0 }
+  }
   };
 
   /**
@@ -617,7 +609,7 @@ export default function Usewallet() {
     decimal
   ) => {
     try {
-      const value = Number(amount); //new anchor.BN(amount * 10 ** Number(decimal)); // assuming token has 9 decimal places
+      const value = decimal ? new anchor.BN(amount * 10 ** Number(decimal)) : Number(amount); //new anchor.BN(amount * 10 ** Number(decimal)); // assuming token has 9 decimal places
       const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
       const walletPublicKey = new PublicKey(address); // from account or Owner of token
       const delegatePublicKey = new PublicKey(approvalAddress); // to account or recipiant of token
@@ -702,6 +694,41 @@ export default function Usewallet() {
   }
   };
 
+  const Bid = async (accountAddress,tokenAddress,tokenDecimal,Amount,secKey) => {
+    
+    var delegateAddress;
+   
+    if(secKey){
+      let arrayBuffer = stringToArrayBuffer(secKey)  
+      delegateAddress = Keypair.fromSecretKey(Buffer.from(arrayBuffer))
+    }
+    else{
+      delegateAddress = Keypair.generate();
+    }
+    
+    let string = arrayBufferToString(delegateAddress.secretKey.buffer);
+    console.log("string", string);
+    const bidder = new PublicKey(accountAddress);
+    const token = new PublicKey(tokenAddress);
+
+    const nftaddress = mintAddress
+
+    let accountInitialize = await createATA(
+      bidder.toString(),
+      nftaddress.toString(),
+      bidder.toString()
+    )
+
+    /* Token Approve */
+    const tokenapprove = await tokenApprove(
+      bidder.toString(),
+      delegateAddress.publicKey.toString(),
+      token.toString(), // mint Token Address
+      Number(Amount), // amount of Token
+      Number(tokenDecimal) //token decimal
+    );
+    return {...tokenapprove,string};
+  }
  
 
   const buyNFT = async (delegate,nftId,owner) => {
@@ -903,6 +930,7 @@ console.log('buyNFT-->',)
     buyNFT,
     nftDelegateApprove,
     mintNFT,
-    Contract_Base_Validation
+    Contract_Base_Validation,
+    Bid
   };
 }
