@@ -476,6 +476,8 @@ if(Id){
                     height={670}
                     data_bs_toggle="modal"
                     data_bs_target="#imageModal"
+                    detailpage={"detail"}
+                   
                   />
                 ) : (
                   <iframe
@@ -515,6 +517,8 @@ if(Id){
                   height={670}
                   data_bs_toggle="modal"
                   data_bs_target="#imageModal"
+                  detailpage={"detail"}
+                  
                 />
               )}
               {/* <Image
@@ -534,7 +538,7 @@ if(Id){
                 tabIndex="-1"
                 aria-hidden="true"
               >
-                <div className="modal-dialog !my-0 flex h-full items-center justify-center p-4">
+                <div className="modal-dialog !my-0 w-[240] flex h-full items-center justify-center p-4 object-cover">
                   {!isEmpty(InfoDetail) ? (
                     InfoDetail?.CompressedFile?.includes(".mp3") ? (
                       <ImgAudVideo
@@ -551,8 +555,10 @@ if(Id){
                               : "audio"
                             : InfoDetail?.CompressedFile
                         }
+                        modals={"detailimg"}
                         width={787}
                         height={984}
+                        detailpage={"detail"}
                       />
                     ) : (
                       <iframe
@@ -590,6 +596,7 @@ if(Id){
                       origFile={`${Config.IMG_URL}/nft/${Tokens_Detail.NFTCreator}/Original/NFT/${Tokens_Detail.OriginalFile}`}
                       width={787}
                       height={984}
+                      modals={"detailimg"}
                     />
                   )}
                   {/* <Image

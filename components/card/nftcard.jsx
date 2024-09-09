@@ -23,6 +23,7 @@ export default function Nftcard({
   LikedTokenList,
   setLikedTokenList,
   LikeForwardRef,
+  hotnft
 }) {
   console.log("product-->", product,product?.cur_owner_Profile);
   const payload = useSelector(
@@ -112,7 +113,7 @@ return data
 //  }
 
   return (
-    <div className="block rounded-2.5xl border border-jacarta-100 bg-white p-[1.1875rem] transition-shadow hover:shadow-lg dark:border-jacarta-700 dark:bg-jacarta-700 h-full">
+    <div className={`block rounded-2.5xl border border-jacarta-100 bg-white p-[1.1875rem] transition-shadow hover:shadow-lg dark:border-jacarta-700 dark:bg-jacarta-700 h-full ${hotnft && 'min-h-[419px]'}`}>
       <figure className="relative">
         <Link
           href={`/item/${product?.ContractAddress}/${product?.NFTOwner}/${product?.NFTId}`}

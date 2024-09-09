@@ -70,6 +70,7 @@ export default function Activity({ datas, Loadmore, List, userProfile, Loader })
                            : "audio"
                        : item?.CompressedFile
                    }
+                   activity={'activitynft'}
               />
             </figure>
 

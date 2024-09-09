@@ -378,6 +378,7 @@ console.log('playerRefcurrenteeeee' , playerRef?.current?.swiper)
                    LikedTokenList={LikedTokenList}
                    setLikedTokenList={setLikedTokenList}
                    LikeForwardRef={LikeForwardRef}
+                   hotnft={true}
                   />
                 </article>
               </SwiperSlide>

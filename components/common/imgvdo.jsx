@@ -17,6 +17,9 @@ export default function ImgAudVideo({
   data_bs_target,
   from,
   noimg,
+  modals,
+  detailpage,
+  activity
 }) {
   useEffect(() => {
     const preventContextMenu = (event) => {
@@ -56,7 +59,7 @@ export default function ImgAudVideo({
         height={height ?? 230}
         src={isEmpty(file) ? "/img/products/item_5.jpg" : file ? file.includes('undefined') ?  "/img/products/item_5.jpg" :  file : "/img/products/item_5.jpg"}
         alt="item 5"
-        className={classname ? classname : "w-full rounded-[0.625rem] h-[430px] object-cover"}
+        className={classname ? classname : modals == 'detailimg' ?"w-[560px] rounded-[0.625rem] h-[560px] object-cover" : "w-full rounded-[0.625rem] h-[430px] object-cover"}
         loading="lazy"
         onError={(event) => {
           event.target.src = origFile;
@@ -78,7 +81,7 @@ export default function ImgAudVideo({
         width={width ?? 230}
         height={height ?? 230}
         preload="none"
-        className={classname ? classname :"w-full rounded-[0.625rem] h-[430px] object-cover"}
+        className={classname ? classname : modals == 'detailimg' ?"w-[560px] rounded-[0.625rem] h-[560px] object-cover" : "w-full rounded-[0.625rem] h-[430px] object-cover"}
         onError={(event) => {
           event.target.src = origFile;
         }}
@@ -87,25 +90,28 @@ export default function ImgAudVideo({
       ></video>
     ) : type === "audio" ? (
       <>
+      <div className={activity == "activitynft" ? "relative" :"h-full "}>
         {" "}
         <img
           src={thumb}
           alt="favicon"
           onClick={Audioaction}
-          className={classname ? classname :"w-full rounded-[0.625rem] h-[430px] object-cover"}
+          className={classname ? classname : modals == 'detailimg' ?"w-[560px] rounded-[0.625rem] h-[560px] object-cover" : "w-full rounded-[0.625rem] h-[430px] object-cover"}
         />
         <audio
           controlsList="nodownload"
           id="nftaudio"
           controls
           autoPlay
-          className="w-fill"
+          className={detailpage =='detail' ? "w-fill mt-[10px]" :activity == "activitynft" ? "w-fill absolute bottom-0 h-[35px]" : "w-fill absolute bottom-0" }
           type="audio/*"
           muted
           src={file}
+       
         >
           {/* <source  type="audio/*" /> */}
         </audio>
+      </div>
       </>
     ) : (
       <Image
@@ -113,7 +119,7 @@ export default function ImgAudVideo({
         height={height ?? 230}
         src={isEmpty(file) ? "/img/products/item_5.jpg" : file}
         alt="item 5"
-        className={classname ? classname :"w-full rounded-[0.625rem] h-[430px] object-cover"}
+        className={classname ? classname : modals == 'detailimg' ?"w-[560px] rounded-[0.625rem] h-[560px] object-cover" : "w-full rounded-[0.625rem] h-[430px] object-cover"}
         loading="lazy"
         data-bs-toggle={data_bs_toggle ?? ""}
         data-bs-target={data_bs_target ?? ""}
@@ -125,7 +131,7 @@ export default function ImgAudVideo({
       height={height ?? 230}
       src={isEmpty(file) ? "/img/products/item_5.jpg" : file ? file.includes('undefined') ?  "/img/products/item_5.jpg" :  file : "/img/products/item_5.jpg"}
       alt="item 5"
-      className={classname ? classname :"w-full rounded-[0.625rem] h-[430px] object-cover"}
+      className={classname ? classname : modals == 'detailimg' ?"w-[560px] rounded-[0.625rem] h-[560px] object-cover" : "w-full rounded-[0.625rem] h-[430px] object-cover"}
       loading="lazy"
       data-bs-toggle={data_bs_toggle ?? ""}
       data-bs-target={data_bs_target ?? ""}
