@@ -308,7 +308,7 @@ export default function Create() {
           console.log("🚀 ~ onChange ~ width, height:", width, height);
           if (
             acceptedfile[0].type.includes("image") &&
-            (height < 230 || height < "230" || width < 230 || width < "230")
+            (height < 230 || width < 230 )
           ) {
             return toast.error("Image size must be 230X230 ");
           }else{

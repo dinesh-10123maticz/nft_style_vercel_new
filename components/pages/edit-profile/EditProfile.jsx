@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 
 //Functions
 import { userRegister } from "@/actions/axios/user.axios";
-import { isEmpty } from "@/actions/common";
+import { isEmpty,loadImageFromFile } from "@/actions/common";
 import Config from "@/Config/config";
 
 export default function EditProfile({params}) {
@@ -29,17 +29,22 @@ export default function EditProfile({params}) {
   const [Follow, SetFollow] = useState("follow");
 
   const copyToClipboard = (text) => {
-    navigator.clipboard.writeText(text).then(
-      () => {
-        // toast.success('Copied!');
-        console.log('Copied!');
-
-      },
-      () => {
-        console.error('Failed to copy!');
-        // toast.error('Failed to copy!');
-      }
-    );
+    try{
+      navigator?.clipboard?.writeText(text)?.then(
+        () => {
+          // toast.success('Copied!');
+          console.log('Copied!');
+  
+        },
+        () => {
+          console.error('Failed to copy!');
+          // toast.error('Failed to copy!');
+        }
+      );
+    }catch(err){
+      console.log("err",err)
+    }
+   
   };
 
 
@@ -96,44 +101,60 @@ export default function EditProfile({params}) {
     const toastupd = toast.loading("You Updated Image");
     handleImageChange(event);
     const { id, files } = event.target;
-    var fileNameExt = files[0].name.substr(files[0].name.lastIndexOf(".") + 1);
-    if (event.target.files && event.target.files[0]) {
-      if ((files, id, files[0].type.includes("image"))) {
-        var file = event.target.files[0];
-        var Resp;
-        Resp = await userRegister({
-          Type: "profileimage",
-          WalletAddress: userData.WalletAddress,
-          Profile: files[0],
-        });
-        if (Resp?.success == "success") {
-          dispatch({
-            type: "Register_Section",
-            Register_Section: {
-              User: {
-                payload: Resp?.data,
-                token: Resp.token ? Resp.token : token,
-              },
-            },
-          });
-          toast.update(toastupd, {
-            render: Resp.msg,
-            type: "success",
-            isLoading: false,
-            autoClose: 700,
-            closeButton: true,
-            closeOnClick: true,
-          });
-        }
-      } else {
-        toast.update(toastupd, {
-          render: "Profile or Cover Image Must be a Image",
+    const { width, height } = await loadImageFromFile(files[0]);
+    console.log("🚀 ~ CoverImg ~ width, height:", width, height)
+
+    if (height !== 300 || width  !== 300) {
+      return toast.update(
+        toastupd, {
+          render: "Image size must be 300X300",
           type: "error",
           isLoading: false,
           autoClose: 700,
           closeButton: true,
           closeOnClick: true,
         });
+    }
+    else{
+      var fileNameExt = files[0].name.substr(files[0].name.lastIndexOf(".") + 1);
+      if (event.target.files && event.target.files[0]) {
+        if ((files, id, files[0].type.includes("image"))) {
+          var file = event.target.files[0];
+          var Resp;
+          Resp = await userRegister({
+            Type: "profileimage",
+            WalletAddress: userData.WalletAddress,
+            Profile: files[0],
+          });
+          if (Resp?.success == "success") {
+            dispatch({
+              type: "Register_Section",
+              Register_Section: {
+                User: {
+                  payload: Resp?.data,
+                  token: Resp.token ? Resp.token : token,
+                },
+              },
+            });
+            toast.update(toastupd, {
+              render: Resp.msg,
+              type: "success",
+              isLoading: false,
+              autoClose: 700,
+              closeButton: true,
+              closeOnClick: true,
+            });
+          }
+        } else {
+          toast.update(toastupd, {
+            render: "Profile or Cover Image Must be a Image",
+            type: "error",
+            isLoading: false,
+            autoClose: 700,
+            closeButton: true,
+            closeOnClick: true,
+          });
+        }
       }
     }
   };

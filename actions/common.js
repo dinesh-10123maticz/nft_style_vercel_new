@@ -280,3 +280,17 @@ export function timeAgo(date) {
   }
   return Math.floor(seconds) + " second" + (seconds > 1 ? "s" : "") + " ago";
 }
+
+
+export async function loadImageFromFile(file) {
+  return new Promise((resolve, reject) => {
+    const img = new window.Image();
+    const fileURL = URL.createObjectURL(file);
+    img.src = fileURL;
+    img.onload = function () {
+      const width = img.width;
+      const height = img.height;
+      resolve({ width, height });
+    };
+  });
+}
