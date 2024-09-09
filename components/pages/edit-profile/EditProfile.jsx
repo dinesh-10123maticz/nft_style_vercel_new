@@ -461,8 +461,7 @@ export default function EditProfile({params}) {
                 Profile Image
               </span>
               <div className="text-sm leading-normal dark:text-jacarta-300">
-                We recommend an image of at least 300x300. Gifs work too. Max
-                5mb.
+                We recommend an image of at least 300x300. Gifs work too
               </div>
             </div>
           </div>
