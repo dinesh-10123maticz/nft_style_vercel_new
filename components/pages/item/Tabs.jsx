@@ -127,7 +127,7 @@ export default function Tabs({
           </li>
 
           {/* Price History */}
-          <li className="nav-item" role="presentation">
+          {/* <li className="nav-item" role="presentation">
             <button
               className="nav-link relative flex items-center whitespace-nowrap py-3 px-6 text-jacarta-400 hover:text-jacarta-700 dark:hover:text-white"
               id="price-history-tab"
@@ -152,7 +152,7 @@ export default function Tabs({
                 Price History
               </span>
             </button>
-          </li>
+          </li> */}
         </ul>
 
         {/* Tab Content */}

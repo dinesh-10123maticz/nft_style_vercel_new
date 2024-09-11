@@ -356,7 +356,7 @@ const sortingOptions = [{key : "BLTH" ,  value : "Price Low to High" } , {key : 
         </h2>
         <div className="mb-8 flex flex-wrap items-center justify-between">
           <ul className="flex flex-wrap items-center">
-            <li className="my-1 mr-2.5">
+          <li className="my-1 mr-2.5">
               <div
                 onClick={() => setActiveCategory("all")}
                 className={`  ${
@@ -367,6 +367,19 @@ const sortingOptions = [{key : "BLTH" ,  value : "Price Low to High" } , {key : 
                     : "dark:bg-jacarta-900"
                 } cursor-pointer group flex h-9 items-center rounded-lg border border-jacarta-100  px-4 font-display text-sm font-semibold text-jacarta-500 transition-colors hover:border-transparent hover:bg-accent hover:text-white dark:border-jacarta-600  dark:text-white dark:hover:border-transparent dark:hover:bg-accent dark:hover:text-white`}
               >
+                  <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                className="h-[20px] w-[20px] fill-current text-black dark:text-white ml-[5px] mr-[7px]"
+                style={{ fill: "currentColor" }}
+              >
+                <path fill="none" d="M0 0h24v24H0z" />
+                <path
+                  d={"M22 12.999V20a1 1 0 0 1-1 1h-8v-8.001h9zm-11 0V21H3a1 1 0 0 1-1-1v-7.001h9zM11 3v7.999H2V4a1 1 0 0 1 1-1h8zm10 0a1 1 0 0 1 1 1v6.999h-9V3h8z"}
+                />
+              </svg>{"   "}
                 All
               </div>
             </li>

@@ -769,7 +769,7 @@ if(Id){
                 )}
               </h1>
 
-              <div className="mb-8 flex items-center space-x-4 whitespace-nowrap">
+              <div className="mb-3 flex items-center space-x-4 whitespace-nowrap">
                 {!isEmpty(Tokens[TabName]?.highbid) && (
                   <div className="flex items-center">
                     <span className="-ml-1" data-tippy-content="ETH">
@@ -827,7 +827,20 @@ if(Id){
                 </span>
               </div>
 
+              {Tokens[TabName]?.owner?.PutOnSaleType === "FixedPrice" && (
+                <p className="created mt-0 mb-3 text-sm text-jacarta-400 dark:text-white">
+                  <span>Price:</span>&nbsp;
+                  <span className="amountss">
+                    {Tokens[TabName]?.owner?.NFTPrice}&nbsp;
+                    {Tokens[TabName]?.owner?.CoinName}
+                  </span>
+                </p>
+              )}
+
               <div className="mb-10 dark:text-jacarta-300">
+              <p className="created text-sm text-jacarta-400 dark:text-white">
+                  Description :
+                </p>
                 {isEmpty(InfoDetail)
                   ? Tokens_Detail?.NFTDescription
                   : InfoDetail?.NFTDescription}
@@ -935,10 +948,10 @@ if(Id){
                     </span>
                     <Link href={`/user/6`} className="block text-accent">
                       <span className="text-sm font-bold">
-                        @{Tokens_Detail?.Creator_DisplayName
-                          ? Tokens_Detail?.Creator_DisplayName
+                        @{Tokens_Detail?.Current_Owner?.[0]?.DisplayName
+                          ? Tokens_Detail?.Current_Owner?.[0]?.DisplayName
                           : address_showing(
-                              Tokens_Detail?.Creator_WalletAddress
+                              Tokens_Detail?.Current_Owner?.[0]?.CustomUrl
                             )}
                       </span>
                     </Link>

@@ -59,8 +59,8 @@ console.log("itemaaaaaaaaa",item)
   const token_address = currency?.filter((item) => item.label === owner.CoinName)?.pop()?.address ??  Config.DEADADDRESS;
   const YouWillGet = useMemo(() => {
     return (Number(owner.NFTPrice) * Number(NFTQuantity))
-  }, [owner.TokenPrice, NFTQuantity]);
-
+  }, [owner, NFTQuantity]);
+   console.log("owner.NFTPrice",owner.NFTPrice,NFTQuantity)
   const totalPrice = useMemo(()=>{
     Number(NFTQuantity) * Number(owner?.NFTPrice)
   },[NFTQuantity])
@@ -188,7 +188,9 @@ console.log("itemaaaaaaaaa",item)
     if (isEmpty(error)) {
       let cont = await ContractCall.buyNFT(
         Decryptdata(item.currentOwner.delegate),
-        item?.NFTId,item?.currentOwner?.NFTOwner
+        item?.NFTId,
+        item?.currentOwner?.NFTOwner,
+        owner.NFTPrice
       )
       // .buy_721_1155(
       //   web3p.utils.toWei(YouWillGet.toString()),

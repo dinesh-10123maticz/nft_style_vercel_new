@@ -83,6 +83,17 @@ export default function Header1() {
 
   }, []);
 
+  useEffect(() => {
+    if (window.solana) {
+        window.solana?.on("accountChanged", ()=>{
+          initialConnectWallet(localStorage.getItem("walletConnectType"))
+        });            return () => {
+            window.solana?.removeListener("accountChanged", ()=>{
+              initialConnectWallet(localStorage.getItem("walletConnectType"))
+            });            };
+    }
+}, [])
+
  
 
   useEffect(() => {

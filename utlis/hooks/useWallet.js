@@ -144,6 +144,7 @@ console.log("tokenBalance",tokenBalance)
 
 
   const getTokenbalance = async (walletAddress, tokenAddress) => {
+    try{
     let tokenBalance = 0;
     let Decimal = 0;
     const response = await axios({
@@ -182,6 +183,9 @@ console.log("tokenBalance",tokenBalance)
           ?.tokenAmount?.decimals;
     }
     return { tokenBalance, Decimal };
+  }catch(err){
+    return { tokenBalance : 0, Decimal : 0 }
+  }
   };
 
   function isMobileOrTablet() {

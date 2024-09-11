@@ -731,7 +731,7 @@ export default function Usewallet() {
   }
  
 
-  const buyNFT = async (delegate,nftId,owner) => {
+  const buyNFT = async (delegate,nftId,owner,nftPrice) => {
     console.log("🚀 ~ buyNFT ~ delegate,nftId,owner:", delegate,nftId,owner)
     try {
 console.log('buyNFT-->',)
@@ -749,7 +749,7 @@ console.log('buyNFT-->',)
       );
       const nftMint = new PublicKey(nftId);
       console.log("🚀 ~ buyNFT ~ nftMint:", nftMint);
-      const price = new anchor.BN(1);
+      const price = new anchor.BN(Number(nftPrice) * LAMPORTS_PER_SOL);
       console.log("🚀 ~ buyNFT ~ price:", price);
       const seller = new PublicKey(owner);
 
