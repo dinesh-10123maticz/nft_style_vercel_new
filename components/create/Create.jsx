@@ -726,12 +726,14 @@ export default function Create() {
       NFTFormValue.NFTRoyalty,
       NFTFormValue.NFTQuantity
     );
-    if (cont) {
+    console.log('contcontcontmintNFT-->',cont)
+    if (cont?.status) {
       if (NFTFormValue.PutOnSaleType === "TimedAuction") {
         _data.ClockTime = new Date(NFTFormValue.ClockTime);
         _data.EndClockTime = new Date(NFTFormValue.EndClockTime);
       }
       _data.HashValue = cont.HashValue;
+      _data.metadata_account = cont?.metadata_account
       _data.NFTId = cont?.tokenCounts?.toString();
       _data.click = `${Config.FRONT_URL}/info/${
         NFTFormValue?.CollectionNetwork

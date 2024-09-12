@@ -63,7 +63,8 @@ export default function Usewallet() {
 
   
    const {web3,accountAddress,coinBalance} = useSelector((state)=>state.LoginReducer.AccountDetails)
-
+   const {owner} = useSelector((state)=>state.LoginReducer)
+   const { sellerFees , buyerFees } = useSelector((state) => state.LoginReducer.ServiceFees);
 
 
    const Contract_Base_Validation = () => {
@@ -731,8 +732,8 @@ export default function Usewallet() {
   }
  
 
-  const buyNFT = async (delegate,nftId,owner,nftPrice) => {
-    console.log("🚀 ~ buyNFT ~ delegate,nftId,owner:", delegate,nftId,owner)
+  const buyNFT = async (delegate,nftId,owner,totalPrice,NFTCreator,NFTRoyalty,NFTQuantity,nftPrice) => {
+    console.log("🚀 ~ buyNFT ~ delegate,nftId,owner,totalPrice,NFTCreator,NFTRoyalty,NFTQuantity,nftPrice:", delegate,nftId,owner,totalPrice,NFTCreator,NFTRoyalty,NFTQuantity,nftPrice)
     try {
 console.log('buyNFT-->',)
       const delegateSecretKey =
@@ -742,39 +743,36 @@ console.log('buyNFT-->',)
     const delegateKeypair = Keypair.fromSecretKey(Buffer.from(delegateSecretKey));
 
       const delegateAddress = delegateKeypair;
-      console.log(
-        "🚀 ~ buyNFT ~ delegateAddress:",
-        delegateAddress,
-        delegateAddress.publicKey.toString()
-      );
+      
       const nftMint = new PublicKey(nftId);
-      console.log("🚀 ~ buyNFT ~ nftMint:", nftMint);
-      const price = new anchor.BN(Number(nftPrice) * LAMPORTS_PER_SOL);
-      console.log("🚀 ~ buyNFT ~ price:", price);
+      const price = new anchor.BN(Number(totalPrice) * LAMPORTS_PER_SOL);
+      
+      const single_price = new anchor.BN(Number(nftPrice) * LAMPORTS_PER_SOL);
+
+      const nftQuantity = new anchor.BN(Number(NFTQuantity))
       const seller = new PublicKey(owner);
+      const royalty = new anchor.BN(Number(NFTRoyalty))
 
-      console.log("🚀 ~ buyNFT ~ seller:", seller);
       const buyer = new PublicKey(accountAddress);
-      console.log("🚀 ~ buyNFT ~ buyer:", buyer);
       let program = await getProgramInstance(idl);
-      console.log("🚀 ~ buyNFT ~ program:", program);
       const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
-
       const sellerATA = await getAssociatedTokenAddress(nftMint, seller);
-
-      console.log("🚀 ~ buyNFT ~ sellerATA:", sellerATA);
-
       const buyerATA = 
       await createATA(
         buyer.toString(),
         nftMint.toString(),
         buyer.toString()
-      );
-
-      console.log("🚀 ~ buyNFT ~ buyerATA:", buyerATA);
+      )
+      const buyerfee_per = new anchor.BN(buyerFees)
+      console.log("🚀 ~ buyNFT ~ buyerfee_per:", buyerfee_per)
+      console.log("🚀 ~ buyNFT ~ buyerFees:", buyerFees)
+      const sellerfee_per = new anchor.BN(sellerFees)
+      console.log("🚀 ~ buyNFT ~ sellerfee_per:", sellerfee_per)
+      console.log("🚀 ~ buyNFT ~ sellerFees:", sellerFees)
+      console.log("single_price,price,nftQuantity,royalty,buyerfee_per,sellerfee_per",single_price,price,nftQuantity,royalty,buyerfee_per,sellerfee_per)
 
       let transaction = await program.methods
-        .buyNft(price)
+        .buyNft(single_price,price,nftQuantity,royalty,buyerfee_per,sellerfee_per)
         .accounts({
           buyer: buyer,
           seller: seller,
@@ -782,6 +780,8 @@ console.log('buyNFT-->',)
           buyerNftAccount: buyerATA, // Replace with the buyer's NFT token account
           delegate: delegateAddress.publicKey, // Replace with the delegate authority's public key
           tokenProgram: TOKEN_PROGRAM_ID,
+          creator : new PublicKey(NFTCreator),
+          owner : new PublicKey(owner),
           systemProgram: SystemProgram.programId,
         })
         .transaction();
@@ -812,107 +812,126 @@ console.log('buyNFT-->',)
       return retData;
     } catch (err) {
       console.log("🚀 ~ buyNFT ~ err:", err);
-      return false
+      return {status : false}
     }
   };
 
-  const mintNFT = async (walletAddress,metaipfs,nftName,royalty,count) => {
-    const connection = new Connection(clusterApiUrl(Config.network), "confirmed");
-    let program = await getProgramInstance(idl);
-    const payer = new PublicKey(walletAddress);
-    console.log("🚀 ~ constsol_git_mintfuct= ~ payer:", payer);
-    const mintAccount = Keypair.generate();
-    console.log("🚀 ~ constsol_git_mintfuct= ~ mintAccount:", mintAccount);
-    const tokenMetadataProgram = new PublicKey(
-      "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
-    );
-    console.log(
-      "🚀 ~ constsol_git_mintfuct= ~ tokenMetadataProgram:",
-      tokenMetadataProgram
-    );
-    const metadata = {
-      name: nftName,
-      symbol: "",
-      uri: `${Config.IPFS}${metaipfs}`,//"https://naifty.infura-ipfs.io/ipfs/QmYqwDtZSJHzsrxjqwvntBp7CfwsN6AZPswAFSRrRVy3Wg",
-    };
-    const associatedTokenAccount = getAssociatedTokenAddressSync(
-      mintAccount.publicKey,
-      payer
-    );
-    console.log(
-      "🚀 ~ constsol_git_mintfuct= ~ associatedTokenAccount:",
-      associatedTokenAccount
-    );
-    const metadataAccount = PublicKey.findProgramAddressSync(
-      [
-        Buffer.from("metadata"),
-        tokenMetadataProgram.toBuffer(),
-        mintAccount.publicKey.toBuffer(),
-      ],
-      tokenMetadataProgram
-    )[0];
-
-    const editionAccount = PublicKey.findProgramAddressSync(
-      [
-        Buffer.from("metadata"),
-        tokenMetadataProgram.toBuffer(),
-        mintAccount.publicKey.toBuffer(),
-        Buffer.from("edition"),
-      ],
-      tokenMetadataProgram
-    )[0];
-
-    const tokenProgram = TOKEN_PROGRAM_ID;
-    const associatedTokenProgram = ASSOCIATED_TOKEN_PROGRAM_ID;
-    const systemProgram = SystemProgram.programId;
-    console.log("🚀 ~ constsol_git_mintfuct= ~ systemProgram:", systemProgram);
-    const rent = new PublicKey("SysvarRent111111111111111111111111111111111");
-
-    let accounts = {
-      payer: payer.toString(),
-      metadataAccount,
-      editionAccount,
-      mintAccount: mintAccount.publicKey.toString(),
-      associatedTokenAccount,
-      tokenProgram,
-      tokenMetadataProgram,
-      associatedTokenProgram,
-      systemProgram,
-      rent,
-    };
-
-    let transaction = await program.methods
-      .mintNft(metadata.name, metadata.symbol, metadata.uri)
-      .accounts(accounts)
-      .signers([mintAccount])
-      // .rpc({ skipPreflight: true })
-      .transaction();
-    console.log("transaction-->", transaction);
-
-    transaction.feePayer = payer;
-    const { blockhash } = await connection.getLatestBlockhash();
-    transaction.recentBlockhash = blockhash;
-    transaction.sign(mintAccount);
-    console.log("blockhash-->", blockhash, transaction);
-    const signed = await web3.signTransaction(transaction);
-    console.log("signed-->", signed, connection);
-    const signature = await connection.sendRawTransaction(signed.serialize());
-    console.log("signature-->", signature);
-    if (signature) {
-      console.log(
-        "TransactionHash",
-        `https://explorer.solana.com/tx/${signature}?cluster=devnet`
+  const mintNFT = async (walletAddress,metaipfs,nftName,NFTRoyalty,nftCount) => {
+    try{
+      const connection = new Connection(clusterApiUrl(Config.network), "confirmed");
+      let program = await getProgramInstance(idl);
+  
+      const count = new anchor.BN(nftCount ?? 1)
+      const royalty = new anchor.BN(100)
+      const sellerfee = new anchor.BN(Number(NFTRoyalty)*100)
+  
+  
+      const payer = new PublicKey(walletAddress);
+      console.log("🚀 ~ constsol_git_mintfuct= ~ payer:", payer);
+      const mintAccount = Keypair.generate();
+      console.log("🚀 ~ constsol_git_mintfuct= ~ mintAccount:", mintAccount);
+      const tokenMetadataProgram = new PublicKey(
+        "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
       );
+      console.log(
+        "🚀 ~ constsol_git_mintfuct= ~ tokenMetadataProgram:",
+        tokenMetadataProgram
+      );
+      const metadata = {
+        name: nftName,
+        symbol: "",
+        uri: `${Config.IPFS}${metaipfs}`,//"https://naifty.infura-ipfs.io/ipfs/QmYqwDtZSJHzsrxjqwvntBp7CfwsN6AZPswAFSRrRVy3Wg",
+      };
+      const associatedTokenAccount = getAssociatedTokenAddressSync(
+        mintAccount.publicKey,
+        payer
+      );
+      console.log(
+        "🚀 ~ constsol_git_mintfuct= ~ associatedTokenAccount:",
+        associatedTokenAccount
+      );
+      const metadataAccount = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("metadata"),
+          tokenMetadataProgram.toBuffer(),
+          mintAccount.publicKey.toBuffer(),
+        ],
+        tokenMetadataProgram
+      )[0];
+  
+      const editionAccount = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from("metadata"),
+          tokenMetadataProgram.toBuffer(),
+          mintAccount.publicKey.toBuffer(),
+          Buffer.from("edition"),
+        ],
+        tokenMetadataProgram
+      )[0];
+  
+      const tokenProgram = TOKEN_PROGRAM_ID;
+      const associatedTokenProgram = ASSOCIATED_TOKEN_PROGRAM_ID;
+      const systemProgram = SystemProgram.programId;
+      console.log("🚀 ~ constsol_git_mintfuct= ~ systemProgram:", systemProgram);
+      const rent = new PublicKey("SysvarRent111111111111111111111111111111111");
+  
+      let accounts = {
+        payer: payer.toString(),
+        metadataAccount,
+        editionAccount,
+        mintAccount: mintAccount.publicKey.toString(),
+        associatedTokenAccount,
+        tokenProgram,
+        tokenMetadataProgram,
+        associatedTokenProgram,
+        systemProgram,
+        rent,
+      };
+  
+      let transaction = await program.methods
+        .mintNft(metadata.name,
+           metadata.symbol, 
+           metadata.uri,
+           count,
+           royalty,
+           sellerfee
+          )
+        .accounts(accounts)
+        .signers([mintAccount])
+        // .rpc({ skipPreflight: true })
+        .transaction();
+      console.log("transaction-->", transaction);
+  
+      transaction.feePayer = payer;
+      const { blockhash } = await connection.getLatestBlockhash();
+      transaction.recentBlockhash = blockhash;
+      transaction.sign(mintAccount);
+      console.log("blockhash-->", blockhash, transaction);
+      const signed = await web3.signTransaction(transaction);
+      console.log("signed-->", signed, connection);
+      const signature = await connection.sendRawTransaction(signed.serialize());
+      console.log("signature-->", signature);
+      if (signature) {
+        console.log(
+          "TransactionHash",
+          `https://explorer.solana.com/tx/${signature}?cluster=devnet`
+        );
+      }
+      let signhash = await connection.confirmTransaction(signature);
+      console.log("signhash-->", signhash);
+      let status = await getTransactionstatus(signature);
+  
+      let retData = {
+        status : true,
+          HashValue : signature,
+          tokenCounts : mintAccount.publicKey.toString(),
+          metadata_account : metadataAccount.toString()
+      }
+      return retData;
+    }catch(err){
+      console.log("🚀 ~ mintNFT ~ err:", err)
+      return {status : false}
     }
-    let signhash = await connection.confirmTransaction(signature);
-    console.log("signhash-->", signhash);
-    let status = await getTransactionstatus(signature);
-
-    let retData = {
-        HashValue : signature,
-        tokenCounts : mintAccount.publicKey.toString(),  
-    }
-    return retData;
   };
 
 

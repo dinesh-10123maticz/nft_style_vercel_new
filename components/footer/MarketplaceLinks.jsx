@@ -13,7 +13,7 @@ useEffect(() => {
 },[Categorys])
   return (
     <>
-      {nftCategories.map((elm, i) => (
+      {nftCategories.slice(0,5).map((elm, i) => (
         <li key={i}>
           <Link
             href={`/collections/${elm.value}`}

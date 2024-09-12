@@ -81,7 +81,7 @@ export default function Nav() {
               </span>
             </Link>
           </li>
-          {categories.map((elm, i) => (
+          {categories.slice(0,9).map((elm, i) => (
             <li key={i} className="flex gap-[2px] mb-[5px]">
               {console.log("sdggxx", elm)}
               <img

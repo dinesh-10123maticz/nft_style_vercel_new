@@ -68,6 +68,18 @@
         {
           "name": "nftUri",
           "type": "string"
+        },
+        {
+          "name": "count",
+          "type": "u64"
+        },
+        {
+          "name": "royalty",
+          "type": "u8"
+        },
+        {
+          "name": "sellerfee",
+          "type": "u16"
         }
       ]
     },
@@ -100,6 +112,16 @@
           "isSigner": true
         },
         {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "owner",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "tokenProgram",
           "isMut": false,
           "isSigner": false
@@ -112,7 +134,27 @@
       ],
       "args": [
         {
+          "name": "nftPrice",
+          "type": "u64"
+        },
+        {
           "name": "price",
+          "type": "u64"
+        },
+        {
+          "name": "count",
+          "type": "u64"
+        },
+        {
+          "name": "royaltyper",
+          "type": "u64"
+        },
+        {
+          "name": "buyerfeePer",
+          "type": "u64"
+        },
+        {
+          "name": "sellerfeePer",
           "type": "u64"
         }
       ]
@@ -239,6 +281,6 @@
     }
   ],
   "metadata": {
-    "address": "Gqbj3x12tqmMM4ZT9JEjsEsLGKa3HPXYVBuG7qcdokcr"
+    "address": "7Qu4LSPn5Ss2Wmn8hiUic7Bw3fqda3LV7U2vYVEjCNUx"
   }
 }

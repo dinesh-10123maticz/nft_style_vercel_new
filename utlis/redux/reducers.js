@@ -34,13 +34,14 @@ const Initial_State = {
         web3p : null
     },
     ServiceFees:{
-      buyerFees : '0',
-      sellerFees : '0',
+      buyerFees : 1,
+      sellerFees : 1,
       baseRoyalty : '0'
     },
     follow : true,
     userdata:{},
-    updateIndication : false
+    updateIndication : false,
+    owner : "E5aVUioJFd6C2NcFsLKferyaaQfLPPrBPHZZPxuvPRJw"
   }
 
 

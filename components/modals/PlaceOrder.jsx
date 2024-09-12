@@ -47,6 +47,8 @@ export default function PlaceOrder({
   item,
   onhide,
 }) {
+  const { sellerFees } = useSelector((state) => state.LoginReducer.ServiceFees);
+
   const initialTokenValue = {
     ClockTime: "",
     EndClockTime: "",
@@ -135,8 +137,8 @@ export default function PlaceOrder({
   };
 
   const YouWillGet = useMemo(() => {
-    return 0; //ContractCall.price_calculation(FormValue.NFTPrice);
-  }, [FormValue?.NFTPrice]);
+    return FormValue?.NFTPrice == 0 ? 0 : (FormValue?.NFTPrice - Number(sellerFees)/100)
+  }, [FormValue?.NFTPrice,sellerFees]);
 
   const onChange = (e) => {
     const { files, value, id } = e.target;
@@ -736,8 +738,8 @@ export default function PlaceOrder({
                       </div>
                     </div>
                   </div>
-                  {/* <div className="dark:text-jacarta-300">Service Fees {String(0)}%</div>
-                  <div className="dark:text-jacarta-300">You will receive SOL</div> */}
+                  <div className="dark:text-jacarta-300">Service Fees {String(sellerFees)}%</div>
+                  <div className="dark:text-jacarta-300">You will receive {Number(YouWillGet).toFixed(6)} {FormValue.CoinName}</div>
                 </div>
               ) : (
                 <div className="mb-4">

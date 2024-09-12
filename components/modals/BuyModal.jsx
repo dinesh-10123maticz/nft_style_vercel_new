@@ -36,7 +36,7 @@ export default function BuyModal({ closePop, owner, item }) {
 
   const ContractCall = solanaContract()
   // useContractProviderHook();
-console.log("itemaaaaaaaaa",item)
+console.log("itemaaaaaaaaa",owner, item)
 
   const dispatch = useDispatch()
   const userData = useSelector((state) => state.LoginReducer.User.payload);
@@ -58,7 +58,7 @@ console.log("itemaaaaaaaaa",item)
   const decimal = currency?.filter((item) => item.label === owner.CoinName)?.pop()?.decimal ??   18;
   const token_address = currency?.filter((item) => item.label === owner.CoinName)?.pop()?.address ??  Config.DEADADDRESS;
   const YouWillGet = useMemo(() => {
-    return (Number(owner.NFTPrice) * Number(NFTQuantity))
+    return ((Number(owner.NFTPrice) * Number(NFTQuantity)) + (Number(owner.NFTPrice) * Number(NFTQuantity)) * Number(buyerFees)/100)
   }, [owner, NFTQuantity]);
    console.log("owner.NFTPrice",owner.NFTPrice,NFTQuantity)
   const totalPrice = useMemo(()=>{
@@ -190,6 +190,10 @@ console.log("itemaaaaaaaaa",item)
         Decryptdata(item.currentOwner.delegate),
         item?.NFTId,
         item?.currentOwner?.NFTOwner,
+        YouWillGet,
+        item?.NFTCreator,
+        item?.NFTRoyalty,
+        NFTQuantity,
         owner.NFTPrice
       )
       // .buy_721_1155(
@@ -212,7 +216,7 @@ console.log("itemaaaaaaaaa",item)
       //   ]
       // );
       console.log("contcont", cont);
-      if (cont) {
+      if (cont?.status) {
         let newOwner = {
           HashValue: cont.HashValue,
           NewTokenOwner: accountAddress,
@@ -389,14 +393,14 @@ console.log("itemaaaaaaaaa",item)
               <span className="font-display text-sm font-semibold text-jacarta-700 dark:text-white">Price :</span>
               <span className="font-displaytext-sm dark:text-jacarta-200"> {owner?.NFTPrice} {owner?.CoinName}</span>
             </div>
-            {/* <div className="mb-2 flex items-center justify-between">
+            <div className="mb-2 flex items-center justify-between">
               <span className="font-display text-sm font-semibold text-jacarta-700 dark:text-white">Service Fee :</span>
               <span className="font-displaytext-sm dark:text-jacarta-200"> {String(buyerFees)} % {owner.CoinName}</span>
-            </div> */}
-            {/* <div className="mb-2 flex items-center justify-between">
+            </div>
+            <div className="mb-2 flex items-center justify-between">
               <span className="font-display text-sm font-semibold text-jacarta-700 dark:text-white">Royalty Fee :</span>
               <span className="font-displaytext-sm dark:text-jacarta-200"> {item.NFTRoyalty} % {owner.CoinName}</span>
-            </div> */}
+            </div>
             <div className="mb-2 flex items-center justify-between">
               <span className="font-display text-sm font-semibold text-jacarta-700 dark:text-white">You Will Pay :</span>
               <span className="font-displaytext-sm dark:text-jacarta-200"> {YouWillGet} {owner.CoinName} </span>

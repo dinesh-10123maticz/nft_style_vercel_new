@@ -223,7 +223,8 @@ return data
         
       </div>
      <div className="mt-2 text-sm flex items-center justify-between">
-     {product?.NFTPrice &&  product?.NFTPrice !== "0" && <span className="flex items-center whitespace-nowrap rounded-md border border-jacarta-100 py-1 px-2 dark:border-jacarta-600">
+     { product?.PutOnSaleType == "FixedPrice" && product?.NFTPrice &&  product?.NFTPrice !== "0" && 
+     <span className="flex items-center whitespace-nowrap rounded-md border border-jacarta-100 py-1 px-2 dark:border-jacarta-600">
          <span data-tippy-content="SOL">
 
             <Image
