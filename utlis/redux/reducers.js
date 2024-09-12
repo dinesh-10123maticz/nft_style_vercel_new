@@ -41,7 +41,7 @@ const Initial_State = {
     follow : true,
     userdata:{},
     updateIndication : false,
-    owner : "E5aVUioJFd6C2NcFsLKferyaaQfLPPrBPHZZPxuvPRJw"
+    owneraddress : "E5aVUioJFd6C2NcFsLKferyaaQfLPPrBPHZZPxuvPRJw"
   }
 
 

@@ -63,7 +63,7 @@ export default function Usewallet() {
 
   
    const {web3,accountAddress,coinBalance} = useSelector((state)=>state.LoginReducer.AccountDetails)
-   const {owner} = useSelector((state)=>state.LoginReducer)
+   const {owneraddress} = useSelector((state)=>state.LoginReducer)
    const { sellerFees , buyerFees } = useSelector((state) => state.LoginReducer.ServiceFees);
 
 
@@ -781,7 +781,7 @@ console.log('buyNFT-->',)
           delegate: delegateAddress.publicKey, // Replace with the delegate authority's public key
           tokenProgram: TOKEN_PROGRAM_ID,
           creator : new PublicKey(NFTCreator),
-          owner : new PublicKey(owner),
+          owner : new PublicKey(owneraddress),
           systemProgram: SystemProgram.programId,
         })
         .transaction();
