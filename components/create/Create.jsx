@@ -152,7 +152,6 @@ export default function Create() {
   };
 
   useEffect(() => {
-    console.log("currentCurrency", currency[0]);
     setNFTFormValue({
       ...NFTFormValue,
       ["CoinName"]: currency?.[0]?.value,
@@ -212,7 +211,6 @@ export default function Create() {
           });
         }
       } else if (e.value == "2 days") {
-        console.log("NFTCOINNAME", NFTFormValue.CoinName);
 
         if (NFTFormValue.ClockTime === "") {
           setNFTFormValue({
@@ -256,7 +254,6 @@ export default function Create() {
 
   // Input and Image onChange Function
   const onChange = async (e, acceptedfile, type) => {
-    console.log("acceptedfile-->", acceptedfile, type, e);
     if (accountAddress) {
       SetFormButton("start");
       SetValidateError({});
@@ -264,7 +261,6 @@ export default function Create() {
         const { value, id } = e.target;
         if (id == "NFTRoyalty" || id == "NFTPrice" || id == "NFTMinimumBid") {
           const checkprice = Config.NumOnly;
-          console.log("checkprice.test(value)", checkprice.test(value), value);
           if (checkprice.test(value) || value == "")
             setNFTFormValue({ ...NFTFormValue, ...{ [id]: value } });
         } else {
@@ -303,9 +299,7 @@ export default function Create() {
           );
         }
         if (type == "Orginal") {
-          console.log("original", acceptedfile[0]);
           const { width, height } = await loadImageFromFile(acceptedfile[0]);
-          console.log("🚀 ~ onChange ~ width, height:", width, height);
           if (
             acceptedfile[0].type.includes("image") &&
             (height < 230 || width < 230 )
@@ -420,7 +414,6 @@ export default function Create() {
     }
     setValue(obj);
     setKey(obj2);
-    console.log("checkkkk", check, ind, obj);
     document.getElementById("key").value = "";
     document.getElementById("value").value = "";
     setNumber(
@@ -491,7 +484,6 @@ export default function Create() {
     }
 
     if (!Category) ValidateError.Category = "Category Required";
-    console.log("jhsdjghsdhkgsouttt", NFTOrginalImage);
 
     if (!NFTOrginalImage) {
       ValidateError.NFTOrginalImage = "OriginalFile Required";
@@ -518,14 +510,7 @@ export default function Create() {
       }
     }
 
-    console.log(
-      "isEmptyyyy",
-      key[number.length - 2],
-      number.length - 1,
-      key[number.length - 1],
-      isEmpty(key[number.length - 1]),
-      isEmpty(Value[number.length - 1])
-    );
+  
     if (Object.values(key)?.length > 0 || Object.values(Value)?.length > 0) {
       for (var i = 0; i < number.length; i++) {
         if (isEmpty(key[i])) {
@@ -543,22 +528,14 @@ export default function Create() {
       }
     }
 
-    console.log(
-      "ksgfdkhgvfg",
-      ValidateError,
-      ContractType,
-      Number(NFTQuantity) % 1 !== 0,
-      NFTQuantity
-    );
+   
     return ValidateError;
   };
   //NFT Form submit function
-  console.log("numbernumber", number, number.length);
   const FormSubmit = async () => {
     SetValidateError({});
     const id = toast.loading("Validating Form");
     var Error = await Validation(NFTFormValue);
-    console.log("Error-->", Error);
     if (isEmpty(Error)) {
       var checkarr = [];
       if (Object.values(key)?.length > 0) {
@@ -644,12 +621,10 @@ export default function Create() {
   const TokenApproveCall = async () => {
     SetApproveButton("process");
     const id = toast.loading("Approve in process");
-    console.log("databeforeapprove", location, NFTFormValue?.ContractAddress);
     const cont = await ContractCall.SetApproveStatus(
       location,
       NFTFormValue?.ContractAddress
     );
-    console.log("contcontcont", cont);
     toast.update(id, {
       render: cont ? "Approved Successfully" : "Approved Failed",
       type: cont ? "success" : "error",
@@ -677,7 +652,6 @@ export default function Create() {
     } = NFTFormValue;
     SetUploadButton("process");
     const id = toast.loading("Uploading  File");
-    console.log("NFTCreatorNFTCreator", NFTCreator);
     var Resp;
     Resp = await NFTImageUpload({
       NFTCreator: NFTCreator ? NFTCreator : accountAddress,
@@ -687,7 +661,6 @@ export default function Create() {
       NFTDescription,
       NFTProperties: JSON.stringify(NFTProperties),
     });
-    console.log("ipfs response", Resp);
 
     if (Resp?.success == "success") {
       setNFTFormValue({ ...NFTFormValue, ...Resp.data });
@@ -717,7 +690,6 @@ export default function Create() {
       : (_data.NFTPrice = _data.NFTPrice);
 
     // let ENc = window.btoa(JSON.stringify(_data));
-    // console.log("sdfgghdfg", ENc);
 
     const cont = await solanaContractHook.mintNFT(
       accountAddress,
@@ -726,7 +698,6 @@ export default function Create() {
       NFTFormValue.NFTRoyalty,
       NFTFormValue.NFTQuantity
     );
-    console.log('contcontcontmintNFT-->',cont)
     if (cont?.status) {
       if (NFTFormValue.PutOnSaleType === "TimedAuction") {
         _data.ClockTime = new Date(NFTFormValue.ClockTime);
@@ -744,12 +715,9 @@ export default function Create() {
       let delegate;
       if (NFTFormValue.PutOnSaleType === "FixedPrice") {
         delegate = await ApproveCallOrListCall();
-        console.log("🚀 ~ MintCall ~ delegate:", delegate);
         _data.delegate = delegate;
       }
 
-      console.log("🚀 ~ MintCall ~ _data.delegate:", _data.delegate);
-      console.log("_data", _data);
       let Resp = await CreateNFT(_data);
       toast.update(id, {
         render: Resp?.msg,
@@ -759,7 +727,6 @@ export default function Create() {
         closeButton: true,
         closeOnClick: true,
       });
-      console.log("mintcallincreate", Resp);
       if (Resp?.success == "success") {
         setMintButton("done");
         toast.update(id, {
@@ -828,7 +795,6 @@ export default function Create() {
     }
   };
 
-  console.log("NFTFormValue-->", NFTFormValue);
 
   return (
     <section className="relative py-24">
